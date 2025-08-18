@@ -11,6 +11,7 @@
 #include <stdlib.h>
 
 #include "xmdtarot.h"
+#include "deck_v1.h"
 
 Widget toplevel;
 GC     gc; /* graphics context */
