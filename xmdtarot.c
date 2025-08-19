@@ -9,6 +9,7 @@
 #include <Xm/PushB.h>
 #include <Xm/Form.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "xmdtarot.h"
 #include "deck_v1.h"
@@ -127,7 +128,51 @@ XmDtCreateMenubar(Widget main_window, ArgList args, int n)
 void
 NewSpread()
 {
-    //TODO
+    int draw[DRAW_SIZE];
+
+    DrawCards(&draw, DRAW_SIZE, DECK_SIZE);
+    RenderDraw(&draw, DRAW_SIZE);
+}
+
+/*
+ * Draws cards
+ */
+static void
+DrawCards(int *draw[], int draw_size, int deck_size)
+{
+    int draw[draw_size], idx, i, j;
+
+    srandom(time(NULL));
+
+    i = 0;
+    while (i < draw_size)
+    {
+redraw:
+        idx = random() % deck_size;
+
+        /* redraw duplicates */
+        for (j = 0; j < i; j++)
+        {
+            if (draw[j] == idx)
+                goto redraw;
+        }
+
+        *draw[i++] = idx;
+    }
+}
+
+/*
+ * Renders the drawn cards to the screen
+ */
+void
+RenderDraw(int *draw[], int draw_size)
+{
+    int i;
+
+    for (i = 0; i < draw_size; i++)
+    {
+        
+    }
 }
 
 /*
@@ -142,7 +187,7 @@ About()
                         "NO rights reserved, but ALL rites reversed.\n"
                         "\n"
                         "Deck and art Kopyleft (K) 2002 Max Flax Beeblewax\n"
-                        "and (Boing!) Cnoocy Mosque O'Wicz (marc@suberic.net)";
+                        "and (Boing!) Cnoocy Mosque O'Witz (marc@suberic.net)";
     
     XmString about_string, label_string, ok_string;
     Widget   about_dialog, about_label;
