@@ -10,19 +10,31 @@
 #include <Xm/Form.h>
 #include <stdlib.h>
 #include <time.h>
+#include <math.h>
 
 #include "xmdtarot.h"
 #include "deck_v1.h"
 
-Widget toplevel;
+Widget toplevel, drawing_area;
 GC     gc; /* graphics context */
 
+/*
+ * Discordian Tarot program
+ * Prints out a reading from the Discordian tarot deck as created by
+ * Max Flax Beeblewax and (boing!) Cnoocy Mosque O'Witz (marc@suberic.net).
+ * 
+ * Usage:
+ * xmdtarot
+ * Prints your (or someone else's) super-helpful Discordian Tarot reading.
+ * 
+ * For further enlightenment, consult your pineal gland.
+ */
 int
 main(int argc, char *argv[])
 {
     XtAppContext app_context;
     XmString     title_string;
-    Widget       main_window, menubar, drawing_area;
+    Widget       main_window, menubar;
     Display      *display;
     Arg          args[X11_ARGS_MAX];
     int          n;
@@ -131,16 +143,16 @@ NewSpread()
     int draw[DRAW_SIZE];
 
     DrawCards(&draw, DRAW_SIZE, DECK_SIZE);
-    RenderDraw(&draw, DRAW_SIZE);
+    RenderDraw(draw, DRAW_SIZE);
 }
 
 /*
  * Draws cards
  */
-static void
+void
 DrawCards(int *draw[], int draw_size, int deck_size)
 {
-    int draw[draw_size], idx, i, j;
+    int idx, i, j;
 
     srandom(time(NULL));
 
@@ -152,27 +164,82 @@ redraw:
 
         /* redraw duplicates */
         for (j = 0; j < i; j++)
-        {
-            if (draw[j] == idx)
-                goto redraw;
-        }
+            if (draw[j] == idx) goto redraw;
 
         *draw[i++] = idx;
     }
 }
 
 /*
+ * Returns the center of the next drawing point for the spread.
+ */
+struct OrderedPair
+GetNextDrawPoint(int spread_index)
+{
+    const double NUM_SIDES  = DRAW_SIZE;
+    const double ANGLE_STEP = 2 * M_PI / NUM_SIDES;
+    const double RADIUS     = 2.5f * (double) CARD_WIDTH;
+
+    struct OrderedPair next_draw_point;
+    double             angle;
+
+    angle             = (double) spread_index * ANGLE_STEP - M_PI / 2;
+    next_draw_point.x = SPREAD_CENTER_X + (int) (RADIUS * cos(angle));
+    next_draw_point.y = SPREAD_CENTER_Y + (int) (RADIUS * sin(angle));
+
+    return next_draw_point;
+}
+
+Pixmap
+GetFacePixmap(Display *display, Window *window, const unsigned char *bits,
+              int width, int height)
+{
+    static Pixmap face_pixmap;
+    Pixmap        buffer;
+    unsigned int  depth;
+
+    XtVaGetValues(drawing_area, XmNdepth, &depth);
+
+    face_pixmap = XCreatePixmap(display, window, width, height, depth);
+    buffer      = XCreateBitmapFromData(display, window, bits, width, height);
+    
+    XCopyPlane(display, buffer, face_pixmap, gc,
+               0, 0, width, height, 0, 0, 0x01);
+
+    return face_pixmap;
+}
+
+/*
  * Renders the drawn cards to the screen
+ *
+ * The spread is in the form of a pentagon, the positions are True (7:30),
+ * False (4:30), Meaningless (12:00), Seek (10:00), Avoid (2:00).
  */
 void
-RenderDraw(int *draw[], int draw_size)
+RenderDraw(int draw[], int draw_size)
 {
-    int i;
+    int                i;
+    struct OrderedPair next_draw_point;
+    unsigned char      *card_face;
+    Pixmap             face_pixmap;
+    Display            *display = XtDisplay(drawing_area);
+    Window             *window  = XtWindow(drawing_area);
 
     for (i = 0; i < draw_size; i++)
     {
-        
+        next_draw_point = GetNextDrawPoint(i);
+        card_face       = FACES[draw[i]];
+        face_pixmap     = GetFacePixmap(display, window, card_face,
+                                        CARD_WIDTH, CARD_HEIGHT);
+        XDrawRectangle(display, window, gc,
+                       next_draw_point.x, next_draw_point.y,
+                       CARD_WIDTH, CARD_HEIGHT);
+        XCopyArea(display, face_pixmap, window, gc, 0, 0,
+                  CARD_WIDTH, CARD_HEIGHT,
+                  next_draw_point.x, next_draw_point.y);
     }
+
+    XFlush(display);
 }
 
 /*

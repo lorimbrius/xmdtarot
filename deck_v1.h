@@ -5,7 +5,7 @@
 #ifndef _DECK_V1_H
 #define _DECK_V1_H
 
-#import "xmdtarot.h"
+#include "xmdtarot.h"
 
 /*
  * The Discordian Tarot Deck v1
@@ -18,7 +18,9 @@
  * an O, a season, and a zip.
  */
 
-#define DECK_SIZE 73
+#define DECK_SIZE    73
+#define CARD_WIDTH  210 /* pixels */
+#define CARD_HEIGHT 314 /* pixels */
 
 /*
  * There are 73 XBM images encoded below. Each has a _width, a _height, and a
