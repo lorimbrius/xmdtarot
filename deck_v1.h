@@ -52680,4 +52680,7 @@ const struct Card DECK[] = {
     {"The Elder Malaclypse", "someone who embodies sight, fire, bizarreness"}
 };
 
+const char DECK_ABOUT_STRING[] = "Deck and art Kopyleft (K) 2002 Max Flax Beeblewax\n"
+                                 "and (Boing!) Cnoocy Mosque O'Witz (marc@suberic.net)";
+
 #endif /* !_DECK_V1_H */

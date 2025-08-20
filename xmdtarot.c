@@ -309,18 +309,17 @@ RenderDraw(int *draw, int draw_size, int width, int height)
 void
 About()
 {
-    char about_text[] = "Code copyright (C) 2025 by Lord Imbrius the Despondent\n"
+    const char ABOUT_TEXT[] = "Code copyright (C) 2025 by Lord Imbrius the Despondent\n"
                         "(darthferrett@gmail.com)\n"
                         "under Creative Commons 0 license\n"
                         "NO rights reserved, but ALL rites reversed.\n"
-                        "\n"
-                        "Deck and art Kopyleft (K) 2002 Max Flax Beeblewax\n"
-                        "and (Boing!) Cnoocy Mosque O'Witz (marc@suberic.net)";
-    
+                        "\n";
+
     XmString about_string, label_string, ok_string;
     Widget   about_dialog, about_label;
     Arg      args[X11_ARGS_MAX];
-    int      n;
+    int      n, about_text_len, deck_about_text_len;
+    char     *about_text_buffer;
 
     n            = 0;
     about_string = XmStringCreateLocalized("About");
@@ -328,8 +327,15 @@ About()
     XtSetArg(args[n], XmNtitle, about_string);                             n++;
     XtSetArg(args[n], XmNdialogStyle, XmDIALOG_PRIMARY_APPLICATION_MODAL); n++;
 
+    about_text_len      = strlen(ABOUT_TEXT);
+    deck_about_text_len = strlen(DECK_ABOUT_STRING);
+    about_text_buffer   = calloc(about_text_len + deck_about_text_len + 1, sizeof(char));
+
+    strncpy(about_text_buffer, ABOUT_TEXT, about_text_len);
+    strncat(about_text_buffer, DECK_ABOUT_STRING, deck_about_text_len);
+
     about_dialog = XmCreateFormDialog(toplevel, "about_dialog", args, n);
-    label_string = XmStringCreateLocalized(about_text);
+    label_string = XmStringCreateLocalized(about_text_buffer);
     about_label  = XtVaCreateManagedWidget("about_label", xmLabelWidgetClass, about_dialog,
                                            XmNtopAttachment,   XmATTACH_FORM,
                                            XmNtopOffset,       ABOUT_TOP_OFFSET,
