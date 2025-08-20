@@ -244,9 +244,10 @@ GetFacePixmap(Display *display, Window window, const unsigned char *bits,
 void
 RenderDraw(int *draw, int draw_size, int width, int height)
 {
-    int                i;
+    int                i, card_name_len;
     struct OrderedPair next_draw_point;
     unsigned char      *card_face;
+    char               *card_name;
     Pixmap             face_pixmap;
     Display            *display = XtDisplay(drawing_area);
     Window             window  = XtWindow(drawing_area);
@@ -263,6 +264,14 @@ RenderDraw(int *draw, int draw_size, int width, int height)
         XCopyArea(display, face_pixmap, window, gc, 0, 0,
                   CARD_WIDTH, CARD_HEIGHT,
                   next_draw_point.x, next_draw_point.y);
+
+        /* Draw card name below card */
+        card_name = DECK[draw[i]].name;
+        card_name_len = strlen(card_name);
+        XDrawString(display, window, gc,
+                       next_draw_point.x + CARD_WIDTH / 2 - card_name_len * 3,
+                       next_draw_point.y + CARD_HEIGHT + 15,
+                       DECK[draw[i]].name, card_name_len);
     }
 
     XFlush(display);
