@@ -1,4 +1,4 @@
-CFLAGS ?= -O2
+CFLAGS ?= -O3
 LDLIBS  = -lm -lXm -lXt -lX11
 PREFIX  = /usr/local
 BINDIR  = games

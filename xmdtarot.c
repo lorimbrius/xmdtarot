@@ -86,8 +86,8 @@ main(int argc, char *argv[])
 }
 
 /*
- * Creates a DrawingArea and wires up three callbacks:
- * XmNexpose, XmNinput, and XmNresize.
+ * Creates a DrawingArea and wires up two callbacks:
+ * XmNexpose and XmNresize.
  * Also calls XtManageChild.
  */
 Widget
@@ -98,7 +98,6 @@ XmDtCreateDrawingArea(Widget main_window, ArgList args, int n)
     drawing_area = XmCreateDrawingArea(main_window, NULL, args, n);
 
     XmDtAddDrawCallback(drawing_area, XmNexposeCallback);
-    XmDtAddDrawCallback(drawing_area, XmNinputCallback);
     XmDtAddDrawCallback(drawing_area, XmNresizeCallback);
     XtManageChild(drawing_area);
 
@@ -199,10 +198,10 @@ MinCardSpacing(int width, int height)
     int min_dim = width < height ? width : height;
 
     /* Leave space for card width so cards don't go off the edge */
-    int max_radius = (min_dim / 2) - (CARD_WIDTH / 2);
+    int max_radius = min_dim / 2 - CARD_WIDTH / 2;
 
     /* Use a fraction of the available space for the radius */
-    int spacing = max_radius * 0.8; // 80% of max possible radius
+    int spacing = max_radius * 0.8; /* 80% of max possible radius */
 
     if (spacing < 0) spacing = 0;
 
