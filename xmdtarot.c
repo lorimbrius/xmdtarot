@@ -35,6 +35,7 @@ main(int argc, char *argv[])
     XtAppContext app_context;
     XmString     title_string;
     Widget       main_window, menubar;
+    Dimension    width, height;
     Display      *display;
     Arg          args[X11_ARGS_MAX];
     int          n;
@@ -66,12 +67,14 @@ main(int argc, char *argv[])
     display = XtDisplay(drawing_area);
     gc      = XCreateGC(display, XtWindow(drawing_area), 0, (XGCValues *) NULL);
 
-    NewSpread();
+    XtVaGetValues(drawing_area, XmNwidth, &width, XmNheight, &height, NULL);
+    NewSpread(width, height);
 
     XmMainWindowSetAreas(main_window, menubar, (Widget) NULL, (Widget) NULL,
                          (Widget) NULL, drawing_area);
     XtVaSetValues(main_window, XmNmessageWindow, drawing_area, NULL);
     XtAppMainLoop(app_context);
+
     return 0;
 }
 
@@ -90,7 +93,6 @@ XmDtCreateDrawingArea(Widget main_window, ArgList args, int n)
     XmDtAddDrawCallback(drawing_area, XmNexposeCallback);
     XmDtAddDrawCallback(drawing_area, XmNinputCallback);
     XmDtAddDrawCallback(drawing_area, XmNresizeCallback);
-
     XtManageChild(drawing_area);
 
     return drawing_area;
@@ -113,7 +115,7 @@ XmDtCreateMenubar(Widget main_window, ArgList args, int n)
 
     XmStringFree(file_string);
 
-    new_spread_string = XmStringCreateLocalized("New Spread");
+    new_spread_string  = XmStringCreateLocalized("New Spread");
     about_string       = XmStringCreateLocalized("About...");
     exit_string        = XmStringCreateLocalized("Quit");
     exit_acc_string    = XmStringCreateLocalized("Ctrl-Q");
@@ -128,7 +130,6 @@ XmDtCreateMenubar(Widget main_window, ArgList args, int n)
     XmStringFree(about_string);
     XmStringFree(exit_string);
     XmStringFree(exit_acc_string);
-
     XtManageChild(menubar);
 
     return menubar;
@@ -138,12 +139,12 @@ XmDtCreateMenubar(Widget main_window, ArgList args, int n)
  * Draws a new spread (resets the screen)
  */
 void
-NewSpread()
+NewSpread(int width, int height)
 {
     int draw[DRAW_SIZE];
 
     DrawCards(&draw, DRAW_SIZE, DECK_SIZE);
-    RenderDraw(draw, DRAW_SIZE);
+    RenderDraw(draw, DRAW_SIZE, width, height);
 }
 
 /*
@@ -171,21 +172,32 @@ redraw:
 }
 
 /*
+ * Determine minimum spacing between cards based on window width
+ */
+int
+MinCardSpacing(int width)
+{
+    return width >= CARD_WIDTH * DRAW_SIZE ? 
+        CARD_WIDTH * width / DRAW_SIZE :
+        CARD_WIDTH;
+}
+
+/*
  * Returns the center of the next drawing point for the spread.
  */
 struct OrderedPair
-GetNextDrawPoint(int spread_index)
+GetNextDrawPoint(int spread_index, int width, int height)
 {
     const double NUM_SIDES  = DRAW_SIZE;
     const double ANGLE_STEP = 2 * M_PI / NUM_SIDES;
-    const double RADIUS     = 2.5f * (double) CARD_WIDTH;
+    const double RADIUS     = MinCardSpacing(width);
 
     struct OrderedPair next_draw_point;
     double             angle;
 
     angle             = (double) spread_index * ANGLE_STEP - M_PI / 2;
-    next_draw_point.x = SPREAD_CENTER_X + (int) (RADIUS * cos(angle));
-    next_draw_point.y = SPREAD_CENTER_Y + (int) (RADIUS * sin(angle));
+    next_draw_point.x = width  / 2 + (int) (RADIUS * cos(angle));
+    next_draw_point.y = height / 2 + (int) (RADIUS * sin(angle));
 
     return next_draw_point;
 }
@@ -198,7 +210,7 @@ GetFacePixmap(Display *display, Window *window, const unsigned char *bits,
     Pixmap        buffer;
     unsigned int  depth;
 
-    XtVaGetValues(drawing_area, XmNdepth, &depth);
+    XtVaGetValues(drawing_area, XmNdepth, &depth, NULL);
 
     face_pixmap = XCreatePixmap(display, window, width, height, depth);
     buffer      = XCreateBitmapFromData(display, window, bits, width, height);
@@ -216,19 +228,24 @@ GetFacePixmap(Display *display, Window *window, const unsigned char *bits,
  * False (4:30), Meaningless (12:00), Seek (10:00), Avoid (2:00).
  */
 void
-RenderDraw(int draw[], int draw_size)
+RenderDraw(int draw[], int draw_size, int width, int height)
 {
     int                i;
+    static int         cache[DRAW_SIZE];
     struct OrderedPair next_draw_point;
     unsigned char      *card_face;
     Pixmap             face_pixmap;
     Display            *display = XtDisplay(drawing_area);
     Window             *window  = XtWindow(drawing_area);
 
+    /* In case we call this from the resize callback */
+    if (draw != NULL)
+        memcpy(cache, draw, sizeof (int) * draw_size);
+
     for (i = 0; i < draw_size; i++)
     {
-        next_draw_point = GetNextDrawPoint(i);
-        card_face       = FACES[draw[i]];
+        next_draw_point = GetNextDrawPoint(i, width, height);
+        card_face       = FACES[cache[i]];
         face_pixmap     = GetFacePixmap(display, window, card_face,
                                         CARD_WIDTH, CARD_HEIGHT);
         XDrawRectangle(display, window, gc,
@@ -297,6 +314,5 @@ About()
                             NULL);
 
     XmStringFree(ok_string);
-
     XtManageChild(about_dialog);
 }

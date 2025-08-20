@@ -28,28 +28,30 @@ struct OrderedPair
 void draw_callback(Widget _widget, XtPointer _client_data, XtPointer _call_data);
 void file_callback(Widget _widtet, XtPointer _client_data, XtPointer _call_data);
 
-void               About(void);
-struct OrderedPair GetNextDrawPoint(int _spread_index);
+struct OrderedPair GetNextDrawPoint(int _spread_index, int _width, int _height);
 Pixmap             GetFacePixmap(Display *_display, Window *_window,
                                  const unsigned char *_bits,
                                  int _width, int _height);
-void               RenderDraw(int _draw[], int _draw_size);
-void               DrawCards(int *_draw[], int _draw_size, int _deck_size);
-void               NewSpread(void);
+
+int  MinCardSpacing(int _width);
+void RenderDraw(int _draw[], int _draw_size, int _width, int _height);
+void DrawCards(int *_draw[], int _draw_size, int _deck_size);
+void NewSpread(int _width, int _height);
+void About(void);
 
 /* macros */
 #define DRAW_SIZE            5 /* number of cards to draw at a time */
 #define X11_ARGS_MAX        20 /* maximum number of arguments to pass to XtAppInitialize */
 #define INITIAL_WIDTH      640 /* initial width of the window in pixels */
 #define INITIAL_HEIGHT     480 /* initial height of the window in pixels */
-#define SPREAD_CENTER_X    320 /* x-coordinate of center of drawn spread */
-#define SPREAD_CENTER_Y    240 /* y-coordinate of center of drawn spread */
 #define ABOUT_TOP_OFFSET    10 /* about dialog top offset in pixels */
 #define ABOUT_LEFT_OFFSET   10 /* about dialog left offset in pixels */
 #define ABOUT_RIGHT_OFFSET  10 /* about dialog right offset in pixels */
 #define ABOUT_BOTTOM_OFFSET 10 /* about dialog bottom offset in pixels */
 #define ABOUT_BUTTON_LEFT   45 /* left position of the OK button on about box in pixels */
 #define ABOUT_BUTTON_RIGHT  80 /* right position of the OK button on about box in pixels */
+
+/* File menu choices */
 #define NEW_SPREAD_OPTION    0
 #define ABOUT_OPTION         1
 #define EXIT_OPTION          2
