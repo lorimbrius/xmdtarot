@@ -266,7 +266,7 @@ RenderDraw(int *draw, int draw_size, int width, int height)
                   next_draw_point.x, next_draw_point.y);
 
         /* Draw card name below card */
-        card_name = DECK[draw[i]].name;
+        card_name     = DECK[draw[i]].name;
         card_name_len = strlen(card_name);
         XDrawString(display, window, gc,
                        next_draw_point.x + CARD_WIDTH / 2 - card_name_len * 3,
