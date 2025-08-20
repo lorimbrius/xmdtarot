@@ -16,9 +16,10 @@
 #include "deck_v1.h"
 
 Widget toplevel, drawing_area;
-GC     gc;                  /* graphics context */
-int    initialized = FALSE; /* flag to enable card drawing */
-int    *draw;               /* current draw */
+GC     gc;                    /* graphics context */
+int    *draw;                 /* current draw */
+int    show_meanings = FALSE; /* show meanings flag */
+int    initialized   = FALSE; /* has the graphics context been initialized*/
 
 /*
  * Discordian Tarot program
@@ -107,7 +108,7 @@ Widget
 XmDtCreateMenubar(Widget main_window, ArgList args, int n)
 {
     XmString file_string, new_spread_string, about_string, exit_string,
-             exit_acc_string;
+             exit_acc_string, show_meanings_string, show_meanings_acc_string;
     Widget   menubar, file_menu;
 
     file_string = XmStringCreateLocalized("File");
@@ -117,16 +118,24 @@ XmDtCreateMenubar(Widget main_window, ArgList args, int n)
 
     XmStringFree(file_string);
 
-    new_spread_string  = XmStringCreateLocalized("New Spread");
-    about_string       = XmStringCreateLocalized("About...");
-    exit_string        = XmStringCreateLocalized("Quit");
-    exit_acc_string    = XmStringCreateLocalized("Ctrl-Q");
-    file_menu          = XmVaCreateSimplePulldownMenu(menubar, "file_menu", 0, file_callback,
-                                                      XmVaPUSHBUTTON, new_spread_string,  'N', NULL,          NULL,
-                                                      XmVaPUSHBUTTON, about_string,       'A', NULL,          NULL,
-                                                      XmVaSEPARATOR,
-                                                      XmVaPUSHBUTTON, exit_string,        'Q', "Ctrl<Key>q",  exit_acc_string,
-                                                      NULL);
+    new_spread_string        = XmStringCreateLocalized("New Spread");
+    show_meanings_string     = XmStringCreateLocalized("Show Meanings");
+    show_meanings_acc_string = XmStringCreateLocalized("Ctrl-M");
+    about_string             = XmStringCreateLocalized("About...");
+    exit_string              = XmStringCreateLocalized("Quit");
+    exit_acc_string          = XmStringCreateLocalized("Ctrl-Q");
+    file_menu                = XmVaCreateSimplePulldownMenu(menubar,
+        "file_menu", 0, file_callback,
+        XmVaPUSHBUTTON,  new_spread_string,    'N', NULL,          NULL,
+        XmVaCHECKBUTTON, show_meanings_string, 'M', "Ctrl<Key>m",  show_meanings_acc_string,
+        XmVaPUSHBUTTON,  about_string,         'A', NULL,          NULL,
+        XmVaSEPARATOR,
+        XmVaPUSHBUTTON,  exit_string,          'Q', "Ctrl<Key>q",  exit_acc_string,
+        NULL);
+
+    n = 0;
+    XtSetArg(args[n], XmNtearOffModel, XmTEAR_OFF_ENABLED); n++;
+    XtSetValues(file_menu, args, n);
 
     XmStringFree(new_spread_string);
     XmStringFree(about_string);
@@ -250,7 +259,7 @@ RenderDraw(int *draw, int draw_size, int width, int height)
     char               *card_name;
     Pixmap             face_pixmap;
     Display            *display = XtDisplay(drawing_area);
-    Window             window  = XtWindow(drawing_area);
+    Window             window   = XtWindow(drawing_area);
 
     for (i = 0; i < draw_size; i++)
     {

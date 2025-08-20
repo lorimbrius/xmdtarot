@@ -53,8 +53,9 @@ void About(void);
 
 /* File menu choices */
 #define NEW_SPREAD_OPTION    0
-#define ABOUT_OPTION         1
-#define EXIT_OPTION          2
+#define MEANINGS_OPTION      1
+#define ABOUT_OPTION         2
+#define EXIT_OPTION          3
 
 #ifndef M_PI /* somehow not defined in math.h */
 #define M_PI 3.14159265358979323846

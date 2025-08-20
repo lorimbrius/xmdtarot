@@ -9,20 +9,25 @@
 
 extern GC     gc;
 extern Widget drawing_area;
-extern int    initialized, *draw;
+extern int    initialized, *draw, show_meanings;
 
 void
 file_callback(Widget widget, XtPointer client_data, XtPointer call_data)
 {
-    extern void NewSpread(int _width, int _height), About();
-    Dimension   width, height;
-    int         item_no = (int) client_data;
+    extern void                  NewSpread(int _width, int _height), About();
+    int                          item_no = (int) client_data;
+    Dimension                    width, height;
+    XmToggleButtonCallbackStruct *cbs;
 
     switch (item_no)
     {
         case NEW_SPREAD_OPTION:
             XtVaGetValues(drawing_area, XmNwidth, &width, XmNheight, &height, NULL);
             NewSpread(width, height);
+            break;
+        case MEANINGS_OPTION:
+            cbs = (XmToggleButtonCallbackStruct*) call_data;
+            show_meanings = cbs->set;
             break;
         case ABOUT_OPTION:
             About();
