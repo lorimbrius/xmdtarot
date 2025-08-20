@@ -219,6 +219,9 @@ GetFacePixmap(Display *display, Window window, const unsigned char *bits,
 
     face_pixmap = XCreatePixmap(display, (Drawable) window, width, height, depth);
     buffer      = XCreateBitmapFromData(display, (Drawable) window, bits, width, height);
+
+    XSetForeground(display, gc, BlackPixel(display, DefaultScreen(display)));
+    XSetBackground(display, gc, WhitePixel(display, DefaultScreen(display)));
     
     XCopyPlane(display, buffer, face_pixmap, gc,
                0, 0, width, height, 0, 0, 0x01);
