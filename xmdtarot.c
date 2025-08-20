@@ -18,6 +18,7 @@
 Widget toplevel, drawing_area;
 GC     gc;                  /* graphics context */
 int    initialized = FALSE; /* flag to enable card drawing */
+int    *draw;               /* current draw */
 
 /*
  * Discordian Tarot program
@@ -46,17 +47,16 @@ main(int argc, char *argv[])
                                        NULL, sessionShellWidgetClass, NULL);
     title_string = XmStringCreateLocalized("X Discordian Tarot");
     n            = 0;
-
     XtSetArg(args[n], XmNtitle,  title_string);   n++;
     XtSetArg(args[n], XmNwidth,  INITIAL_WIDTH);  n++;
     XtSetArg(args[n], XmNheight, INITIAL_HEIGHT); n++;
-
-    n           = 0;
     main_window = XmCreateMainWindow(toplevel, "main window", args, n);
 
     XmStringFree(title_string);
 
-    n            = 0;
+    n = 0;
+    XtSetArg(args[n], XmNwidth,  INITIAL_WIDTH);  n++;
+    XtSetArg(args[n], XmNheight, INITIAL_HEIGHT); n++;
     drawing_area = XmDtCreateDrawingArea(main_window, args, n);
 
     n       = 0;
@@ -143,8 +143,6 @@ XmDtCreateMenubar(Widget main_window, ArgList args, int n)
 void
 NewSpread(int width, int height)
 {
-    int *draw;
-
     draw = DrawCards(DRAW_SIZE, DECK_SIZE);
     RenderDraw(draw, DRAW_SIZE, width, height);
 }
@@ -180,11 +178,19 @@ redraw:
  * Determine minimum spacing between cards based on window width
  */
 int
-MinCardSpacing(int width)
+MinCardSpacing(int width, int height)
 {
-    return width >= CARD_WIDTH * DRAW_SIZE ? 
-        CARD_WIDTH * width / DRAW_SIZE :
-        CARD_WIDTH;
+    int min_dim = width < height ? width : height;
+
+    /* Leave space for card width so cards don't go off the edge */
+    int max_radius = (min_dim / 2) - (CARD_WIDTH / 2);
+
+    /* Use a fraction of the available space for the radius */
+    int spacing = max_radius * 0.8; // 80% of max possible radius
+
+    if (spacing < 0) spacing = 0;
+
+    return spacing;
 }
 
 /*
@@ -195,14 +201,14 @@ GetNextDrawPoint(int spread_index, int width, int height)
 {
     const double NUM_SIDES  = DRAW_SIZE;
     const double ANGLE_STEP = 2 * M_PI / NUM_SIDES;
-    const double RADIUS     = MinCardSpacing(width);
+    const double RADIUS     = MinCardSpacing(width, height);
 
     struct OrderedPair next_draw_point;
     double             angle;
 
     angle             = (double) spread_index * ANGLE_STEP - M_PI / 2;
-    next_draw_point.x = width  / 2 + (int) (RADIUS * cos(angle));
-    next_draw_point.y = height / 2 + (int) (RADIUS * sin(angle));
+    next_draw_point.x = width  / 2 + (int) (RADIUS * cos(angle)) - CARD_WIDTH  / 2;
+    next_draw_point.y = height / 2 + (int) (RADIUS * sin(angle)) - CARD_HEIGHT / 2;
 
     return next_draw_point;
 }

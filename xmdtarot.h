@@ -33,7 +33,7 @@ Pixmap             GetFacePixmap(Display *_display, Window _window,
                                  const unsigned char *_bits,
                                  int _width, int _height);
 
-int  MinCardSpacing(int _width);
+int  MinCardSpacing(int _width, int _height);
 int  *DrawCards(int _draw_size, int _deck_size);
 void RenderDraw(int *_draw, int _draw_size, int _width, int _height);
 void NewSpread(int _width, int _height);

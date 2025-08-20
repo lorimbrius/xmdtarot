@@ -9,7 +9,7 @@
 
 extern GC     gc;
 extern Widget drawing_area;
-extern int    initialized;
+extern int    initialized, *draw;
 
 void
 file_callback(Widget widget, XtPointer client_data, XtPointer call_data)
@@ -39,13 +39,21 @@ draw_callback(Widget widget, XtPointer client_data, XtPointer call_data)
     XmDrawingAreaCallbackStruct *ptr = (XmDrawingAreaCallbackStruct*) call_data;
     Dimension                   width, height;
     int                         i;
+    static int                  exposed = FALSE;
 
     if (!initialized) return;
 
     XtVaGetValues(widget, XmNwidth, &width, XmNheight, &height, NULL);
 
     if (ptr->reason == XmCR_RESIZE && gc != NULL)
+    {
         XClearWindow(XtDisplay(widget), XtWindow(widget));
-
-    NewSpread(width, height);
+        RenderDraw(draw, DRAW_SIZE, width, height);
+    }
+    else if (ptr->reason == XmCR_EXPOSE && ptr->event->xexpose.count == 0 && !exposed)
+    {
+        NewSpread(width, height);
+        exposed = TRUE;
+    }
+     
 }
