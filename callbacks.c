@@ -14,7 +14,9 @@ extern int    initialized, *draw, show_meanings;
 void
 file_callback(Widget widget, XtPointer client_data, XtPointer call_data)
 {
-    extern void                  NewSpread(int _width, int _height), About();
+    extern void                  NewSpread(int _width, int _height), About(),
+                                 RenderDraw(int *_draw, int _draw_size,
+                                           int _width, int _height);
     int                          item_no = (int) client_data;
     Dimension                    width, height;
     XmToggleButtonCallbackStruct *cbs;
@@ -26,8 +28,11 @@ file_callback(Widget widget, XtPointer client_data, XtPointer call_data)
             NewSpread(width, height);
             break;
         case MEANINGS_OPTION:
-            cbs = (XmToggleButtonCallbackStruct*) call_data;
+            cbs           = (XmToggleButtonCallbackStruct*) call_data;
             show_meanings = cbs->set;
+            XtVaGetValues(drawing_area, XmNwidth, &width, XmNheight, &height, NULL);
+            XClearWindow(XtDisplay(drawing_area), XtWindow(drawing_area));
+            RenderDraw(draw, DRAW_SIZE, width, height);
             break;
         case ABOUT_OPTION:
             About();

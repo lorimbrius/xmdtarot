@@ -52582,20 +52582,20 @@ const unsigned char *FACES[] = {
   trumps_17_bits, trumps_18_bits, trumps_19_bits, trumps_20_bits,
   trumps_21_bits, trumps_22_bits, trumps_23_bits,
   /* SWEETS */
-  sweets_1_bits, sweets_2_bits, sweets_3_bits, sweets_4_bits, sweets_a_bits,
-  sweets_c_bits, sweets_d_bits, sweets_o_bits, sweets_s_bits, sweets_z_bits,
+  sweets_z_bits, sweets_1_bits, sweets_2_bits, sweets_3_bits, sweets_4_bits,
+  sweets_o_bits, sweets_d_bits, sweets_s_bits, sweets_c_bits, sweets_a_bits,
   /* BOOMS */
-  booms_1_bits, booms_2_bits, booms_3_bits, booms_4_bits, booms_a_bits,
-  booms_c_bits, booms_d_bits, booms_o_bits, booms_s_bits, booms_z_bits,
+  booms_z_bits, booms_1_bits, booms_2_bits, booms_3_bits, booms_4_bits,
+  booms_o_bits, booms_d_bits, booms_s_bits, booms_c_bits, booms_a_bits,
   /* PUNGENTS */
-  pungents_1_bits, pungents_2_bits, pungents_3_bits, pungents_4_bits, pungents_a_bits,
-  pungents_c_bits, pungents_d_bits, pungents_o_bits, pungents_s_bits, pungents_z_bits,
+  pungents_z_bits, pungents_1_bits, pungents_2_bits, pungents_3_bits, pungents_4_bits,
+  pungents_o_bits, pungents_d_bits, pungents_s_bits, pungents_c_bits, pungents_a_bits,
   /* PRICKLES */
-  prickles_1_bits, prickles_2_bits, prickles_3_bits, prickles_4_bits, prickles_a_bits,
-  prickles_c_bits, prickles_d_bits, prickles_o_bits, prickles_s_bits, prickles_z_bits,
+  prickles_z_bits, prickles_1_bits, prickles_2_bits, prickles_3_bits, prickles_4_bits,
+  prickles_o_bits, prickles_d_bits, prickles_s_bits, prickles_c_bits, prickles_a_bits,
   /* ORANGES */
-  oranges_1_bits, oranges_2_bits, oranges_3_bits, oranges_4_bits, oranges_a_bits,
-  oranges_c_bits, oranges_d_bits, oranges_o_bits, oranges_s_bits, oranges_z_bits
+  oranges_z_bits, oranges_1_bits, oranges_2_bits, oranges_3_bits, oranges_4_bits,
+  oranges_o_bits, oranges_d_bits, oranges_s_bits, oranges_c_bits, oranges_a_bits
 };
 
 const struct Card DECK[] = {
@@ -52608,9 +52608,9 @@ const struct Card DECK[] = {
     {"VI The Skeptic", "one who rejects ideas"},
     {"VII The Flower", "sex, drugs, hedonism"},
     {"VIII The Trout", "silliness, humor, laughter"},
-    {"IX Conspiracy", "there\"s a plot behind coincidences"},
+    {"IX Conspiracy", "there\'s a plot behind coincidences"},
     {"X Joker", "wild card, could mean anything"},
-    {"XI Net of Synchronicity", "there\"s a cosmic force behind coincidences"},
+    {"XI Net of Synchronicity", "there\'s a cosmic force behind coincidences"},
     {"XII Discordian Deck", "this deck or self-referentialism"},
     {"XIII The Big Bang", "eristic creation"},
     {"XIV The Great Pyramid", "aneristic creation"},

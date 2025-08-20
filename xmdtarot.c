@@ -108,7 +108,8 @@ Widget
 XmDtCreateMenubar(Widget main_window, ArgList args, int n)
 {
     XmString file_string, new_spread_string, about_string, exit_string,
-             exit_acc_string, show_meanings_string, show_meanings_acc_string;
+             exit_acc_string, show_meanings_string, show_meanings_acc_string,
+             new_spread_acc_string;
     Widget   menubar, file_menu;
 
     file_string = XmStringCreateLocalized("File");
@@ -119,6 +120,7 @@ XmDtCreateMenubar(Widget main_window, ArgList args, int n)
     XmStringFree(file_string);
 
     new_spread_string        = XmStringCreateLocalized("New Spread");
+    new_spread_acc_string    = XmStringCreateLocalized("Ctrl-N");
     show_meanings_string     = XmStringCreateLocalized("Show Meanings");
     show_meanings_acc_string = XmStringCreateLocalized("Ctrl-M");
     about_string             = XmStringCreateLocalized("About...");
@@ -126,7 +128,7 @@ XmDtCreateMenubar(Widget main_window, ArgList args, int n)
     exit_acc_string          = XmStringCreateLocalized("Ctrl-Q");
     file_menu                = XmVaCreateSimplePulldownMenu(menubar,
         "file_menu", 0, file_callback,
-        XmVaPUSHBUTTON,  new_spread_string,    'N', NULL,          NULL,
+        XmVaPUSHBUTTON,  new_spread_string,    'N', "Ctrl<Key>n",  new_spread_acc_string,
         XmVaCHECKBUTTON, show_meanings_string, 'M', "Ctrl<Key>m",  show_meanings_acc_string,
         XmVaPUSHBUTTON,  about_string,         'A', NULL,          NULL,
         XmVaSEPARATOR,
@@ -152,6 +154,7 @@ XmDtCreateMenubar(Widget main_window, ArgList args, int n)
 void
 NewSpread(int width, int height)
 {
+    XClearWindow(XtDisplay(drawing_area), XtWindow(drawing_area));
     draw = DrawCards(DRAW_SIZE, DECK_SIZE);
     RenderDraw(draw, DRAW_SIZE, width, height);
 }
@@ -253,10 +256,10 @@ GetFacePixmap(Display *display, Window window, const unsigned char *bits,
 void
 RenderDraw(int *draw, int draw_size, int width, int height)
 {
-    int                i, card_name_len;
+    int                i, card_name_len, card_meaning_len;
     struct OrderedPair next_draw_point;
     unsigned char      *card_face;
-    char               *card_name;
+    char               *card_name, *card_meaning;
     Pixmap             face_pixmap;
     Display            *display = XtDisplay(drawing_area);
     Window             window   = XtWindow(drawing_area);
@@ -281,6 +284,17 @@ RenderDraw(int *draw, int draw_size, int width, int height)
                        next_draw_point.x + CARD_WIDTH / 2 - card_name_len * 3,
                        next_draw_point.y + CARD_HEIGHT + 15,
                        DECK[draw[i]].name, card_name_len);
+
+        if (show_meanings)
+        {
+            /* Draw card meaning below card name */
+            card_meaning     = DECK[draw[i]].meaning;
+            card_meaning_len = strlen(card_meaning);
+            XDrawString(display, window, gc,
+                        next_draw_point.x + CARD_WIDTH / 2 - card_meaning_len * 3,
+                        next_draw_point.y + CARD_HEIGHT + 30,
+                        DECK[draw[i]].meaning, card_meaning_len);
+        }
     }
 
     XFlush(display);
