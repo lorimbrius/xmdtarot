@@ -214,16 +214,16 @@ MinCardSpacing(int width, int height)
 struct OrderedPair
 GetNextDrawPoint(int spread_index, int width, int height)
 {
-    const double NUM_SIDES  = DRAW_SIZE;
-    const double ANGLE_STEP = 2 * M_PI / NUM_SIDES;
-    const double RADIUS     = MinCardSpacing(width, height);
+    const double NUM_SIDES    = DRAW_SIZE;
+    const double ANGLE_STEP   = 2 * M_PI / NUM_SIDES;
+    const double RADIUS       = MinCardSpacing(width, height);
 
     struct OrderedPair next_draw_point;
     double             angle;
 
     angle             = (double) spread_index * ANGLE_STEP - M_PI / 2;
-    next_draw_point.x = width  / 2 + (int) (RADIUS * cos(angle)) - CARD_WIDTH  / 2;
-    next_draw_point.y = height / 2 + (int) (RADIUS * sin(angle)) - CARD_HEIGHT / 2;
+    next_draw_point.x =               width  / 2 + (int) (RADIUS * cos(angle)) - CARD_WIDTH  / 2;
+    next_draw_point.y = TOP_PADDING + height / 2 + (int) (RADIUS * sin(angle)) - CARD_HEIGHT / 2;
 
     return next_draw_point;
 }
@@ -259,13 +259,14 @@ GetFacePixmap(Display *display, Window window, const unsigned char *bits,
 void
 RenderDraw(int *draw, int draw_size, int width, int height)
 {
-    int                i, card_name_len, card_meaning_len;
+    int                i, spread_pos_name_len, card_meaning_len;
     struct OrderedPair next_draw_point;
     unsigned char      *card_face;
-    char               *card_name, *card_meaning;
+    char               *spread_pos_name, *card_meaning;
     Pixmap             face_pixmap;
     Display            *display = XtDisplay(drawing_area);
     Window             window   = XtWindow(drawing_area);
+    Font               bold_font, normal_font;
 
     for (i = 0; i < draw_size; i++)
     {
@@ -280,13 +281,19 @@ RenderDraw(int *draw, int draw_size, int width, int height)
                   CARD_WIDTH, CARD_HEIGHT,
                   next_draw_point.x, next_draw_point.y);
 
-        /* Draw card name below card */
-        card_name     = SPREAD_LABELS[i];
-        card_name_len = strlen(card_name);
+        /* Draw spread position named above card */
+        spread_pos_name = SPREAD_LABELS[i];
+        spread_pos_name_len = strlen(spread_pos_name);
+
+        normal_font = XLoadFont(display, "-*-*-*-*-*-*-*-*-*-*-*-*-iso8859-1"); 
+        bold_font   = XLoadFont(display, "-*-*-bold-*-*-*-*-140-*-*-*-*-iso8859-1");
+        XSetFont(display, gc, bold_font);
         XDrawString(display, window, gc,
-                       next_draw_point.x + CARD_WIDTH / 2 - card_name_len * 3,
-                       next_draw_point.y + CARD_HEIGHT + 15,
-                       card_name, card_name_len);
+                       next_draw_point.x + CARD_WIDTH / 2 - spread_pos_name_len * 4,
+                       next_draw_point.y - 5,
+                       spread_pos_name, spread_pos_name_len);
+        XUnloadFont(display, bold_font);
+        XSetFont(display, gc, normal_font);
 
         if (show_meanings)
         {
@@ -294,10 +301,12 @@ RenderDraw(int *draw, int draw_size, int width, int height)
             card_meaning     = DECK[draw[i]].meaning;
             card_meaning_len = strlen(card_meaning);
             XDrawString(display, window, gc,
-                        next_draw_point.x + CARD_WIDTH / 2 - card_meaning_len * 3,
-                        next_draw_point.y + CARD_HEIGHT + 30,
+                        next_draw_point.x + CARD_WIDTH / 2 - card_meaning_len * 3.5,
+                        next_draw_point.y + CARD_HEIGHT + 15,
                         DECK[draw[i]].meaning, card_meaning_len);
         }
+
+        XUnloadFont(display, normal_font);
     }
 
     XFlush(display);

@@ -50,6 +50,7 @@ void About(void);
 #define ABOUT_BOTTOM_OFFSET 10 /* about dialog bottom offset in pixels */
 #define ABOUT_BUTTON_LEFT   45 /* left position of the OK button on about box in pixels */
 #define ABOUT_BUTTON_RIGHT  80 /* right position of the OK button on about box in pixels */
+#define TOP_PADDING         30 /* top padding for drawing area in pixels */
 
 /* File menu choices */
 #define NEW_SPREAD_OPTION    0
