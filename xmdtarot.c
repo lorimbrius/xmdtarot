@@ -21,6 +21,10 @@ int    *draw;                 /* current draw */
 int    show_meanings = FALSE; /* show meanings flag */
 int    initialized   = FALSE; /* has the graphics context been initialized*/
 
+const char SPREAD_LABELS[DRAW_SIZE][11] = {
+    "True", "Seek", "False", "Avoid", "Meaningless"
+};
+
 /*
  * Discordian Tarot program
  * Prints out a reading from the Discordian tarot deck as created by
@@ -74,7 +78,7 @@ main(int argc, char *argv[])
     initialized = TRUE;
 
     XmMainWindowSetAreas(main_window, menubar, (Widget) NULL, (Widget) NULL,
-                         (Widget) NULL, drawing_area);
+                        (Widget) NULL, drawing_area);
     XtVaSetValues(main_window, XmNmessageWindow, drawing_area, NULL);
     XtAppMainLoop(app_context);
 
@@ -278,12 +282,12 @@ RenderDraw(int *draw, int draw_size, int width, int height)
                   next_draw_point.x, next_draw_point.y);
 
         /* Draw card name below card */
-        card_name     = DECK[draw[i]].name;
+        card_name     = SPREAD_LABELS[i];
         card_name_len = strlen(card_name);
         XDrawString(display, window, gc,
                        next_draw_point.x + CARD_WIDTH / 2 - card_name_len * 3,
                        next_draw_point.y + CARD_HEIGHT + 15,
-                       DECK[draw[i]].name, card_name_len);
+                       card_name, card_name_len);
 
         if (show_meanings)
         {

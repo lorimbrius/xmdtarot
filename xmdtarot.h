@@ -42,8 +42,8 @@ void About(void);
 /* macros */
 #define DRAW_SIZE            5 /* number of cards to draw at a time */
 #define X11_ARGS_MAX        20 /* maximum number of arguments to pass to XtAppInitialize */
-#define INITIAL_WIDTH      640 /* initial width of the window in pixels */
-#define INITIAL_HEIGHT     480 /* initial height of the window in pixels */
+#define INITIAL_WIDTH     1280 /* initial width of the window in pixels */
+#define INITIAL_HEIGHT    1024 /* initial height of the window in pixels */
 #define ABOUT_TOP_OFFSET    10 /* about dialog top offset in pixels */
 #define ABOUT_LEFT_OFFSET   10 /* about dialog left offset in pixels */
 #define ABOUT_RIGHT_OFFSET  10 /* about dialog right offset in pixels */
