@@ -9,6 +9,7 @@
 
 extern GC     gc;
 extern Widget drawing_area;
+extern int    initialized;
 
 void
 file_callback(Widget widget, XtPointer client_data, XtPointer call_data)
@@ -39,21 +40,12 @@ draw_callback(Widget widget, XtPointer client_data, XtPointer call_data)
     Dimension                   width, height;
     int                         i;
 
+    if (!initialized) return;
+
     XtVaGetValues(widget, XmNwidth, &width, XmNheight, &height, NULL);
 
-    /*
-     * If we resize the window, keep the current draw but rerender.
-     * If this is the first time we're drawing the window, we need to draw the
-     * spread.
-     */
+    if (ptr->reason == XmCR_RESIZE && gc != NULL)
+        XClearWindow(XtDisplay(widget), XtWindow(widget));
 
-    if (ptr->reason == XmCR_RESIZE)
-    {
-        if (gc != NULL)
-            XClearWindow(XtDisplay(widget), XtWindow(widget));
-
-        RenderDraw(NULL, DRAW_SIZE, width, height); /* should be cached */
-    }
-    else if (ptr->reason == XmCR_EXPOSE && ptr->event->xexpose.count == 0)
-        NewSpread(width, height);
+    NewSpread(width, height);
 }

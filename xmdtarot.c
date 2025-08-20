@@ -16,7 +16,8 @@
 #include "deck_v1.h"
 
 Widget toplevel, drawing_area;
-GC     gc; /* graphics context */
+GC     gc;                  /* graphics context */
+int    initialized = FALSE; /* flag to enable card drawing */
 
 /*
  * Discordian Tarot program
@@ -69,6 +70,7 @@ main(int argc, char *argv[])
 
     XtVaGetValues(drawing_area, XmNwidth, &width, XmNheight, &height, NULL);
     NewSpread(width, height);
+    initialized = TRUE;
 
     XmMainWindowSetAreas(main_window, menubar, (Widget) NULL, (Widget) NULL,
                          (Widget) NULL, drawing_area);
@@ -141,19 +143,20 @@ XmDtCreateMenubar(Widget main_window, ArgList args, int n)
 void
 NewSpread(int width, int height)
 {
-    int draw[DRAW_SIZE];
+    int *draw;
 
-    DrawCards(&draw, DRAW_SIZE, DECK_SIZE);
+    draw = DrawCards(DRAW_SIZE, DECK_SIZE);
     RenderDraw(draw, DRAW_SIZE, width, height);
 }
 
 /*
  * Draws cards
  */
-void
-DrawCards(int *draw[], int draw_size, int deck_size)
+int*
+DrawCards(int draw_size, int deck_size)
 {
-    int idx, i, j;
+    static int draw[DRAW_SIZE];
+    int        idx, i, j;
 
     srandom(time(NULL));
 
@@ -167,8 +170,10 @@ redraw:
         for (j = 0; j < i; j++)
             if (draw[j] == idx) goto redraw;
 
-        *draw[i++] = idx;
+        draw[i++] = idx;
     }
+
+    return draw;
 }
 
 /*
@@ -203,7 +208,7 @@ GetNextDrawPoint(int spread_index, int width, int height)
 }
 
 Pixmap
-GetFacePixmap(Display *display, Window *window, const unsigned char *bits,
+GetFacePixmap(Display *display, Window window, const unsigned char *bits,
               int width, int height)
 {
     static Pixmap face_pixmap;
@@ -212,8 +217,8 @@ GetFacePixmap(Display *display, Window *window, const unsigned char *bits,
 
     XtVaGetValues(drawing_area, XmNdepth, &depth, NULL);
 
-    face_pixmap = XCreatePixmap(display, window, width, height, depth);
-    buffer      = XCreateBitmapFromData(display, window, bits, width, height);
+    face_pixmap = XCreatePixmap(display, (Drawable) window, width, height, depth);
+    buffer      = XCreateBitmapFromData(display, (Drawable) window, bits, width, height);
     
     XCopyPlane(display, buffer, face_pixmap, gc,
                0, 0, width, height, 0, 0, 0x01);
@@ -228,27 +233,22 @@ GetFacePixmap(Display *display, Window *window, const unsigned char *bits,
  * False (4:30), Meaningless (12:00), Seek (10:00), Avoid (2:00).
  */
 void
-RenderDraw(int draw[], int draw_size, int width, int height)
+RenderDraw(int *draw, int draw_size, int width, int height)
 {
     int                i;
-    static int         cache[DRAW_SIZE];
     struct OrderedPair next_draw_point;
     unsigned char      *card_face;
     Pixmap             face_pixmap;
     Display            *display = XtDisplay(drawing_area);
-    Window             *window  = XtWindow(drawing_area);
-
-    /* In case we call this from the resize callback */
-    if (draw != NULL)
-        memcpy(cache, draw, sizeof (int) * draw_size);
+    Window             window  = XtWindow(drawing_area);
 
     for (i = 0; i < draw_size; i++)
     {
         next_draw_point = GetNextDrawPoint(i, width, height);
-        card_face       = FACES[cache[i]];
+        card_face       = FACES[draw[i]];
         face_pixmap     = GetFacePixmap(display, window, card_face,
                                         CARD_WIDTH, CARD_HEIGHT);
-        XDrawRectangle(display, window, gc,
+        XDrawRectangle(display, (Drawable) window, gc,
                        next_draw_point.x, next_draw_point.y,
                        CARD_WIDTH, CARD_HEIGHT);
         XCopyArea(display, face_pixmap, window, gc, 0, 0,

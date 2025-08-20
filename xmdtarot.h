@@ -29,13 +29,13 @@ void draw_callback(Widget _widget, XtPointer _client_data, XtPointer _call_data)
 void file_callback(Widget _widtet, XtPointer _client_data, XtPointer _call_data);
 
 struct OrderedPair GetNextDrawPoint(int _spread_index, int _width, int _height);
-Pixmap             GetFacePixmap(Display *_display, Window *_window,
+Pixmap             GetFacePixmap(Display *_display, Window _window,
                                  const unsigned char *_bits,
                                  int _width, int _height);
 
 int  MinCardSpacing(int _width);
-void RenderDraw(int _draw[], int _draw_size, int _width, int _height);
-void DrawCards(int *_draw[], int _draw_size, int _deck_size);
+int  *DrawCards(int _draw_size, int _deck_size);
+void RenderDraw(int *_draw, int _draw_size, int _width, int _height);
 void NewSpread(int _width, int _height);
 void About(void);
 

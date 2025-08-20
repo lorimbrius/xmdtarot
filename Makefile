@@ -1,5 +1,5 @@
 CFLAGS ?= -O2
-LDLIBS  = -lXm -lXt -lX11
+LDLIBS  = -lm -lXm -lXt -lX11
 PREFIX  = /usr/local
 BINDIR  = games
 MANDIR  = /share/man/man6
