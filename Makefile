@@ -5,7 +5,7 @@ INCLUDES = -I. -I$(PREFIX)/include
 BINDIR   = games
 MANDIR   = /share/man/man6
 
-DECKV    ?= 1
+DECKV   ?= 1
 
 all: xmdtarot man
 
