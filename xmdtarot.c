@@ -145,7 +145,6 @@ XmDtCreateMenubar(Widget main_window, ArgList args, int n)
         XmVaPUSHBUTTON,  exit_string,          'Q', "Ctrl<Key>q",  exit_acc_string,
         NULL);
 
-    n = 0;
     XtSetArg(args[n], XmNtearOffModel, XmTEAR_OFF_ENABLED); n++;
     XtSetValues(file_menu, args, n);
 
