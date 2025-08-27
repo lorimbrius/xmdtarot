@@ -325,10 +325,10 @@ void
 About()
 {
     const char ABOUT_TEXT[] = "Code copyright (C) 2025 by Lord Imbrius the Despondent\n"
-                        "(darthferrett@gmail.com)\n"
-                        "under Creative Commons 0 license\n"
-                        "NO rights reserved, but ALL rites reversed.\n"
-                        "\n";
+                              "(darthferrett@gmail.com)\n"
+                              "under Creative Commons 0 license\n"
+                              "NO rights reserved, but ALL rites reversed.\n"
+                              "\n";
 
     XmString about_string, label_string, ok_string;
     Widget   about_dialog, about_label;
