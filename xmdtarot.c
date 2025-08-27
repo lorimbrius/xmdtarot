@@ -220,9 +220,9 @@ MinCardSpacing(int width, int height)
 struct OrderedPair
 GetNextDrawPoint(int spread_index, int width, int height)
 {
-    const double NUM_SIDES    = DRAW_SIZE;
-    const double ANGLE_STEP   = 2 * M_PI / NUM_SIDES;
-    const double RADIUS       = MinCardSpacing(width, height);
+    const double NUM_SIDES  = DRAW_SIZE;
+    const double ANGLE_STEP = 2 * M_PI / NUM_SIDES;
+    const double RADIUS     = MinCardSpacing(width, height);
 
     struct OrderedPair next_draw_point;
     double             angle;
