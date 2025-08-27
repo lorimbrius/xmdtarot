@@ -13,7 +13,14 @@
 #include <math.h>
 
 #include "xmdtarot.h"
-#include "deck_v1.h"
+
+#if DECKV == 1
+#   include "deck_v1.h"
+#elif DECKV == 2
+#   include "deck_v2.h"
+#else /* DECKV != 1 && DECKV != 2 */
+#   error "No valid deck selected, please define DECKV as deck_v1 or deck"
+#endif /* DECKV */
 
 Widget toplevel, drawing_area;
 GC     gc;                    /* graphics context */

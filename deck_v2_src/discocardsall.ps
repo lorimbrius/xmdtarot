@@ -1,0 +1,4218 @@
+%!PS-Adobe-2.0
+
+%%BeginProlog
+
+
+/concat {
+ /s2 exch def
+ /s1 exch def
+ /s3 s1 length s2 length add string def
+ s3 0 s1 putinterval
+ s3 s1 length s2 putinterval
+ s3
+} def
+
+%basic definitions for primitives and symbols
+% ellipse library
+/ellipsedict 9 dict def	
+ellipsedict /mtrx matrix put
+/ell {
+        ellipsedict begin
+	/endangle exch def
+	/startangle exch def
+	/yrad exch def
+	/xrad exch def
+	/y exch def
+	/x exch def
+	/savematrix mtrx currentmatrix def
+	x y translate
+	xrad yrad scale
+	0 0 1 startangle endangle arc
+	savematrix setmatrix
+        end
+} def
+/elln {
+        ellipsedict begin
+	/endangle exch def
+	/startangle exch def
+	/yrad exch def
+	/xrad exch def
+	/y exch def
+	/x exch def
+	/savematrix mtrx currentmatrix def
+	x y translate
+	xrad yrad scale
+	0 0 1 startangle endangle arcn
+	savematrix setmatrix
+        end
+} def
+
+/inch {72 mul} def
+/randmax 2 31 exp def
+
+.5 setlinewidth
+1 setlinecap
+1 setlinejoin
+
+/fillstroke {
+ gsave
+ 1 setgray
+ fill
+ grestore
+ stroke
+} def
+
+/grayfillstroke {
+ /gray exch def
+ gsave
+ gray setgray
+ fill
+ grestore
+ stroke
+} def
+
+/arctoalt { %see code for examples: 
+ %essentially takes three items and two already on stack
+ /y2 exch def
+ /x2 exch def
+ /r exch def
+ /y1 exch def
+ /x1 exch def
+ r 0 eq {
+  x1 y1 lineto
+ }{
+  x1 y1 x2 y2 r arcto
+  4 {pop} repeat
+ } ifelse
+ x2 y2 
+} def
+
+/arcbetween { %given 2 points and r, arcs between
+ /r exch def
+ /y2 exch def
+ /x2 exch def
+ /y1 exch def
+ /x1 exch def
+ /direction true def
+ r 0 lt {
+  /r r -1 mul def
+  /direction false def
+ } if
+ /d x1 x2 sub 2 exp y1 y2 sub 2 exp add sqrt def
+ r d 2 div lt { %use semicircle if r too small
+  /r d 2 div def
+ } if
+ /sideangle d r 2 mul div acos def
+ /arcangle 90 sideangle sub 2 mul def
+ /lineangle y2 y1 sub x2 x1 sub atan def
+ %correct for range? possibly not.
+ direction {
+  %direction is true. arc is counterclockwise.
+  /startangle lineangle sideangle add 180 add def
+  x1 startangle 180 sub cos r mul add 
+  y1 startangle 180 sub sin r mul add
+  r startangle startangle arcangle add arc
+ } {
+  %direction is false. arc is clockwise.
+  /startangle lineangle sideangle sub 180 add def
+  x1 startangle 180 sub cos r mul add 
+  y1 startangle 180 sub sin r mul add
+  r startangle startangle arcangle sub arcn
+ } ifelse 
+} def
+
+/arcbetweento {
+ /r exch def
+ /y2 exch def
+ /x2 exch def
+ currentpoint x2 y2 r arcbetween
+} def
+
+/acos {
+ /cosa exch def
+ cosa abs 1 eq{
+  cosa 0 gt {
+   0
+  }{
+   180
+  } ifelse 
+ }{
+  90 cosa 1 cosa 2 exp sub sqrt div 1 atan sub
+ } ifelse
+} def
+
+
+/sweet {
+ gsave
+ currentpoint
+ /y exch def
+ /x exch def
+ newpath
+ x y moveto
+ 15 15 rmoveto
+ x 15 add y 5 add 15 10 90 180 ell
+ x 5 add y 5 add 5 180 360 arc
+ x 15 add y 5 add 5 10 180 90 elln
+ x 15 add y 5 add 10 90 180 arc
+ x  2.5 add y 5 add moveto
+ x 5 add y 5 add 2.5 180 360 arc
+ fillstroke
+ grestore
+ 15 0 rmoveto
+} def
+ 
+/boom {
+ gsave
+ currentpoint
+ /y exch def
+ /x exch def
+ newpath
+ x y moveto
+ 3.75 3.75 rmoveto
+ x 3.75 add y 7.5 add 3.75 -90 -180 arcn
+ x 7.5 add y 7.5 add 7.5 180 -90 arcn
+ x 7.5 add y 3.75 add 3.75 270 0 arcn
+ fillstroke
+ grestore
+ 15 0 rmoveto
+} def
+
+/pungent {
+ gsave
+ currentpoint
+ /y exch def
+ /x exch def
+ newpath
+ x y moveto
+ 7.5 15 rmoveto
+ x 7.5 add y 7.5 add 7.5 90 450 arc
+ fill
+ 1 setgray
+ newpath
+ x y moveto
+ 7.5 15 rmoveto 
+ -.5 -7.5 rmoveto
+ x 5 add y 7.5 add 2 0 360 arc
+ 1 0 rmoveto
+ x 10 add y 7.5 add 2 180 -180 arcn
+ fill
+ 0 setgray
+ grestore
+ 15 0 rmoveto 
+} def
+
+/prickle1 {
+ /f 2.5 def %finger width
+ /t 3.75 f 1.25 mul sub def %trough width
+ /h 10 def %low finger height
+ gsave
+ currentpoint
+ /y exch def
+ /x exch def
+ newpath
+ x y translate
+ 0 0 moveto
+ 0 f 2 div rmoveto
+ 0 h rlineto
+ f 2 div h f 2 div add f 2 div 180 0 arcn
+ 0 h f 2 div sub -1 mul rlineto 
+ f t 2 div add f t 2 div 180 360 arc
+ f t add 15 
+ 15 f 2 div sub 0 lineto
+ f 2 div f 2 div f 2 div -90 -180 arcn
+ fill
+ grestore
+ 15 0 rmoveto  
+} def
+
+/prickle{
+ gsave
+ currentpoint
+ /y exch def
+ /x exch def
+ newpath
+ x y translate
+ 0 1.5 moveto
+ 0 10 lineto
+ 3 3 lineto
+ 3.75 15 lineto
+ 6 3 lineto
+ 7.5 10 lineto
+ 9 3 lineto
+ 11.25 15 lineto
+ 12 3 lineto
+ 15 10 lineto
+ 15 3 lineto
+ 15 1.5 lineto
+ 13.5 1.5 1.5 0 -90 arcn
+ 1.5 0 lineto
+ 1.5 1.5 1.5 -90 -180 arcn
+ fill
+ grestore
+ 15 0 rmoveto 
+} def
+
+/orange {
+ gsave
+ currentpoint
+ /y exch def
+ /x exch def
+ newpath
+ x y moveto
+ 7.5 15 rmoveto
+ x 7.5 add y 7.5 add 7.5 90 450 arc
+ fill
+ 1 setgray
+ newpath
+ x y moveto
+ 7.5 15 rmoveto
+ x 7.5 add y 12 add 3 450 90 arcn 
+ fill
+ 0 setgray
+ grestore
+ 15 0 rmoveto 
+} def
+
+/chaos {
+ pebbles
+} def
+
+/discord {
+ star
+ pebbles
+} def
+
+/confusion{
+ star pent
+ pebbles
+} def
+
+/bureaucracy{
+ pent
+ pebbles
+} def
+
+/theaftermath{
+ scatter
+} def
+
+/pebbles {
+ gsave
+ .5 setlinewidth
+ currentpoint
+ /y exch def
+ /x exch def
+ /rad 1 def
+ newpath
+ x 7.5 add y 7.5 add translate
+ 5 {
+  rad 7.5 moveto
+  0 7.5 rad 0 360 arc
+  72 rotate
+ } repeat
+ gsave
+ 1 setgray
+ fill
+ grestore
+ stroke
+ grestore
+} def
+
+/star{
+ gsave
+ .5 setlinewidth
+ currentpoint
+ /y exch def
+ /x exch def
+ /rad 1 def
+ newpath
+ x 7.5 add y 7.5 add translate
+ 0 7.5 moveto
+ 5 {
+  72 2 mul rotate
+  0 7.5 lineto
+ } repeat
+ stroke
+ grestore
+} def
+
+/pent{
+ gsave
+ .5 setlinewidth
+ currentpoint
+ /y exch def
+ /x exch def
+ /rad 1 def
+ newpath
+ x 7.5 add y 7.5 add translate
+ 0 7.5 moveto
+ 5 {
+  72 rotate
+  0 7.5 lineto
+ } repeat
+ stroke
+ grestore
+} def
+
+/scatter{
+ gsave
+ .5 setlinewidth
+ currentpoint
+ /y exch def
+ /x exch def
+ /rad 1 def
+ newpath
+ x 7.5 add y 7.5 add translate
+ %locations
+ 2.5 -3.5
+ -5 -7.5
+ 7 17
+ -7 -5
+ -4 6
+ 5 {
+  gsave
+  translate %grab coords off stack
+  rad 0 moveto
+  0 0 rad 0 360 arc
+  stroke
+  grestore
+ } repeat
+ grestore
+ 15 0 rmoveto
+} def
+
+/graycircle{
+ currentpoint
+ /y exch def
+ /x exch def
+ newpath
+ x y moveto
+ 0 7.5 rmoveto
+ .5 setgray
+ x 7.5 add y 7.5 add 7.5 -180 180 arc 
+ fill
+ 0 setgray
+ x y moveto
+} def
+%card dimensions and borders
+%!
+/pageheight 8 inch def
+/pagewidth 10.5 inch def
+/pageborder 8.5 inch pageheight sub 2 div def
+/cardwidth pageheight 9 mul 32 div def
+/cardheight pageheight cardwidth 2 mul sub def
+
+/cardborders {
+ gsave
+ 0 1 9 {
+  cardstart
+  newpath
+  1 1 moveto
+  1 cardheight 1 sub lineto
+  cardwidth 1 sub cardheight 1 sub lineto
+  cardwidth 1 sub 1 lineto
+  closepath
+  stroke
+  cardend
+ } for
+ grestore
+} def
+
+/cardxs 10 array def
+
+%put x-offsets into cardxs
+0 1 1{
+ /index1 exch def
+  0 1 2 {
+  /index2 exch def
+   cardxs  index1 3 mul index2 add
+     pageborder cardheight index2 mul add   put  
+  } for
+} for 
+0 1 3 {
+ /index1 exch def
+ cardxs  6 index1 add
+  pageborder cardwidth index1 mul add   put
+} for
+
+/cardys 10 array def 
+0 1 1 {
+  /index1 exch def
+  0 1 2 {
+   /index2 exch def
+   cardys  index1 3 mul index2 add
+     pageborder pageheight add cardwidth index1 mul sub  put
+  } for
+} for
+0 1 3 {
+  /index1 exch def
+  cardys  6 index1 add
+  pageborder  put
+} for
+
+/cardrs   [-90  -90  -90  -90  -90  -90    0    0    0    0   ] def
+
+/cardstart {
+ gsave
+ /cardnum exch def
+ cardxs cardnum get cardys cardnum get translate
+ cardrs cardnum get rotate
+ 0 0 moveto
+} def
+
+/cardend {
+  grestore
+} def
+
+
+/pageBegin {
+ .5 setlinewidth
+ 1 setlinecap
+ 1 setlinejoin
+ 8.5 inch 0 inch translate
+ 90 rotate
+} def
+%all non-trump cards, i.e. the suits
+%!
+
+
+/setsuit {
+ /suit [{sweet} {boom} {pungent} {prickle} {orange}] suitnum get def
+} def
+
+/cardstrs [(Z)  (1)  (2)  (3)  (4)  (O)  (D)  (S)  (C)  (A) ] def
+
+/corner {
+ /rank exch def
+ gsave
+ currentpoint moveto
+ gsave
+ basefont 15 scalefont setfont
+ 7.5 0 rmoveto
+ rank stringwidth /wy exch def /wx exch def
+ wx -2 div wy -2 div rmoveto
+ rank show
+ grestore
+ 0 -17 rmoveto
+ suit 
+ grestore
+} def
+
+/cards {
+ gsave
+ 0 1 9 {
+  cardstart
+  gsave
+  2 {
+   gsave
+    0 cardheight moveto 
+    .0625 inch -.0625 inch rmoveto
+    2 -17 rmoveto
+   cardstrs cardnum get corner
+   grestore
+   gsave
+   cardwidth cardheight moveto
+    -.0625 inch -.0625 inch rmoveto
+    -17 -17 rmoveto
+   cardstrs cardnum get corner
+   grestore
+   cardwidth 2 div cardheight 2 div translate
+   180 rotate
+   cardwidth -2 div cardheight -2 div translate
+  } repeat
+  grestore
+  cardfunc
+  cardend
+ } for
+ grestore
+} def
+
+/zip {
+ gsave 
+ cardwidth 2 div cardheight 2 div translate
+ grestore
+} def
+
+/one {
+ gsave
+  cardwidth 2 div cardheight 2 div translate
+  5 5 scale
+  -7.5 -7.5 moveto
+  suit
+ grestore
+} def
+
+/two {
+ gsave
+  cardwidth 2 div cardheight 3 div translate
+  gsave
+   2.5 2.5 scale
+   -7.5 -7.5 moveto
+   suit
+  grestore
+  0 cardheight 3 div translate
+  gsave
+   2.5 2.5 scale
+   -7.5 -7.5 moveto
+   suit
+  grestore
+ grestore
+} def
+
+/three {
+ gsave
+  cardwidth 3 div cardheight 3 div translate
+  2.5 2.5 scale
+  -7.5 -7.5 moveto
+  suit
+ grestore
+ gsave
+  cardwidth 3 div 2 mul cardheight 3 div translate
+  2.5 2.5 scale
+  -7.5 -7.5 moveto
+  suit
+ grestore
+ gsave
+  cardwidth 5 div 3 mul cardheight 3 div 2 mul translate
+  2.5 2.5 scale
+  -7.5 -7.5 moveto
+  suit
+ grestore
+} def
+
+/four {
+ gsave
+  cardwidth 3 div cardheight 3 div translate
+  2.5 2.5 scale
+  -7.5 -7.5 moveto
+  suit
+ grestore
+ gsave
+  cardwidth 3 div 2 mul cardheight 3 div translate
+  2.5 2.5 scale
+  -7.5 -7.5 moveto
+  suit
+ grestore
+ gsave
+  cardwidth 3 div cardheight 3 div 2 mul translate
+  2.5 2.5 scale
+  -7.5 -7.5 moveto
+  suit
+ grestore
+ gsave
+  cardwidth 3 div 2 mul cardheight 3 div 2 mul translate
+  2.5 2.5 scale
+  -7.5 -7.5 moveto
+  suit
+
+
+ grestore
+} def
+
+/onomatopoeia {
+ gsave
+ cardwidth 2 div cardheight 2 div translate
+ /o_string [(MMMMM) (whoosh) (O) (thud) (Wow) ] suitnum get def
+ [/Courier /Times-Italic /Times-Roman /AvantGarde-Demi /ZapfChancery-MediumItalic] suitnum get findfont
+ /fontsize [30 30 70 40 50] suitnum get def
+ fontsize scalefont setfont
+ o_string stringwidth /wy exch def /wx exch def
+ wx -2 div fontsize -2 div translate
+ 0 0 moveto
+ o_string show
+ grestore
+} def
+
+/day {
+ gsave
+ cardwidth 2 div cardheight 2 div translate
+ 2.5 5 mul sqrt dup scale
+ gsave
+ currentlinewidth 2 mul setlinewidth
+ -10 -10 moveto
+ 10 -10 lineto
+ stroke
+ grestore
+ [{sweetmorn} {boomtime} {pungenday} {prickleprickle} {settingorange}] suitnum get exec
+ grestore 
+} def
+
+/sweetmorn {
+ newpath
+ 7.5 0 moveto
+ 7.5 -10 15 10 90 180 ell
+ 7.5 0 moveto
+ 7.5 -10 10 10 90 180 ell
+ 7.5 0 moveto
+ 7.5 -10 5 10 90 180 ell
+ -5 5 moveto
+ 0 10 lineto 
+ 5 5 lineto
+ stroke
+} def
+
+/boomtime {
+ gsave
+ newpath
+ -10 -5 moveto
+ boom
+ 10 2 sqrt div 2.5 sub 10 2 sqrt div 2.5 add moveto
+ -2.5 2.5 10 45 -45 arcn 
+ -2.5 2.5 12.5 -45 45 arc 
+ -2.5 2.5 15 45 -45 arcn 
+ stroke
+ grestore
+} def
+
+/pungenday {
+ gsave
+ 0 5 translate
+  -7.5 -7.5 moveto
+  pungent
+  newpath
+  25 {
+   0 9 moveto
+   0 10 lineto
+   360 25 div rotate
+  } repeat
+  stroke
+ grestore
+} def
+
+/prickleprickle {
+ gsave
+  90 rotate
+  -7.5 -10 moveto
+  prickle
+  gsave
+  180 rotate
+  -7.5 -10 moveto
+  prickle
+  grestore
+ grestore
+} def
+ 
+/settingorange {
+ newpath
+  8 sqrt 2.5 mul -1 mul  -10 moveto
+  0 -7.5 7.5 1 8 sqrt atan 180 add 90 arcn
+  0  -3  3 90 450 arc
+  0 -7.5 7.5 90 1 8 sqrt atan -1 mul arcn
+  closepath
+ fill
+ newpath
+ -5 10 moveto
+ 0 5 lineto
+ 5 10 lineto
+ stroke
+} def
+
+/season {
+ gsave
+  cardwidth 2 div cardheight 2 div translate
+  5 5 scale
+  -7.5 -7.5 moveto
+  [{chaos} {discord} {confusion} {bureaucracy} {theaftermath}] suitnum get exec
+ grestore
+} def
+
+/cow {
+ gsave
+  cardwidth 2 div cardheight 3 div translate
+  5 1.5 scale
+  -45 rotate
+  -7.5 -7.5 moveto
+  suit
+ grestore
+ gsave
+  cardwidth 2 div cardheight 3 div translate
+  5 5 scale
+  0 0 moveto
+  drawcow
+ grestore
+} def
+
+/drawcow{
+ gsave
+ currentpoint translate
+ newpath
+
+
+ -7.25 5.5 	moveto %tail
+ -6.25 9.5 	1
+  0 10 		arctoalt 5
+  5 9.5 	arctoalt 0.125
+ 
+  4.5 10.125 	arctoalt 0 %ear1
+  5 10 		arctoalt 0
+  6.25 10.25	arctoalt 1
+  7.5 10 	arctoalt 0
+  8 10.125 	arctoalt 0 %ear2
+  7.5 9.5 	arctoalt 0.125
+  7.75 8.5 	arctoalt 0.5
+  7.5 7.5 	arctoalt 0.2
+  7.75 7.25 	arctoalt 0.5
+  7.75 6.5 	arctoalt 0.5
+  7.5 6.25 	arctoalt 0.5
+  6.5 6.25 	arctoalt 0.5
+  6 6.75 	arctoalt 0
+		
+  6 4 		arctoalt 0
+  6 0.125 	arctoalt 0
+  5 0.125 	arctoalt 0
+  5 4.75 	arctoalt 0 
+  4.75 4.5 	arctoalt 0
+  4.75 -0.125 	arctoalt 0
+  3.75 -0.125 	arctoalt 0
+  3.75 4 	arctoalt 0
+  .5 3.5 	arctoalt 5
+  -2.5 4 	arctoalt
+  lineto
+  -4 4 1.5 0 -90 arcn
+%  -5 2.5 lineto
+  -4 2.5 0
+  -4 0.125 	arctoalt 0
+  -5 0.125 	arctoalt 0
+  -5 2.75 	arctoalt 0
+  -5.25 3 	arctoalt 0
+  -5.25 -0.125 	arctoalt 0 
+  -6.25 -0.125 	arctoalt 0
+  -6.25 7 	arctoalt
+  lineto
+  closepath
+ .1 setlinewidth
+ gsave
+ 1 setgray
+ fill
+ grestore
+ gsave
+ clip
+ newpath
+ 0 10 moveto
+ -5 10 5 0 360 arc
+ 4 5 moveto
+ 2 5 2 0 360 arc 
+ 8.5 8.5 moveto
+ 7.5 8.5 1 0 360 arc
+ fill
+ grestore
+ stroke
+ 0 setgray
+ newpath
+ 7 8.5 moveto
+ .25 0 rmoveto
+ 7 8.5 .25 0 360 arc
+ 6 8.5 moveto
+ .25 0 rmoveto
+ 6 8.5 .25 0 360 arc
+ gsave
+ fill
+ grestore
+ gsave
+ 1 setgray
+ .0625 setlinewidth
+ stroke
+ 0 setgray
+ grestore
+ newpath
+ 7.375 7.0 moveto
+ 7.25 7.0 .125 0 360 arc
+ 6.875 7.0 moveto
+ 6.75 7.0 .125 0 360 arc
+ fill
+ grestore
+} def
+
+/old_drawcow{
+ gsave
+ currentpoint translate
+ newpath
+ %should be all arctoalt
+
+ -7.5 6.5 moveto %tail
+ -6.7 9.5 .25
+  0 10 arctoalt 1
+  5 9.5 arctoalt 0
+ 
+  4.5 10 arctoalt 0 %ear1
+  5 10 arctoalt 0
+  7.5 10 arctoalt 0
+  8 10 arctoalt 0 %ear2
+  7.5 9.5 arctoalt 0
+  8 7.5 arctoalt 0
+  8 6.5 arctoalt 0
+  7.5 6 arctoalt 0
+  6.5 6 arctoalt 0
+  6 6.5 arctoalt 0
+
+   6 4 arctoalt 0
+   6 0 arctoalt 0
+   5 0 arctoalt 0
+   5 4 arctoalt 0 
+   4.5 4 arctoalt 0
+   4.5 0 arctoalt 0
+   3.5 0 arctoalt 0
+   3.5 4 arctoalt 0
+   .5 3.5 arctoalt 0
+   -2.5 4 arctoalt
+   lineto
+   -4 4 1.5 0 -90 arcn
+   -4 2.5 0
+   -4 0 arctoalt 0
+   -5 0 arctoalt 0
+   -5 2.5 arctoalt 0
+   -5.5 2.5 arctoalt 0
+  -5.5 0 arctoalt 0 
+  -6.5 0 arctoalt 0
+  -6.5 7 arctoalt
+  lineto
+  closepath
+ fill
+ 1 setgray
+ newpath
+ 7 8.5 moveto
+ .25 0 rmoveto
+ 7 8.5 .25 0 360 arc
+ 6 8.5 moveto
+ .25 0 rmoveto
+ 6 8.5 .25 0 360 arc
+ fill
+ grestore
+} def
+
+/apostle {
+ gsave
+ cardwidth 2 div cardheight 2 div translate
+ [{hungmung} {vanvanmojo} {gulik} {zarathud} {malaclypse}] suitnum get exec
+ grestore
+} def
+
+/robe {
+ gsave
+ .5 setlinewidth
+ newpath
+ 5 -70 moveto
+ 20 -70 5
+ 17.5 0 arctoalt 5
+ 25 45 arctoalt 7.5
+ 10 45 arctoalt 5
+ 0 35 arctoalt 7.5
+ -10 45 arctoalt 5
+ -25 45 arctoalt 7.5
+ -17.5 0 arctoalt 5
+ -20 -75 arctoalt 5
+ 0 -70 arctoalt 5
+ 5 -70 arctoalt
+ lineto
+ .75 grayfillstroke
+ grestore
+} def
+
+/head {
+ gsave
+ 1 setlinewidth
+ 0 45 moveto
+ newpath
+ 0 56.25 7.5 11.25 -90 270 ell
+ fillstroke
+ grestore 
+} def
+
+/eyes { 
+ gsave
+  1 setlinewidth
+  newpath
+  4 56.25 moveto
+  3 56.25 1 0 360 arc
+  -4 56.25 moveto
+  -3 56.25 1 -180 180 arc
+%  2 60 moveto
+%  4 60 lineto
+%  -2 60 moveto
+%  -4 60 lineto
+  stroke
+ grestore
+} def
+
+/torso {
+ gsave
+ 1 setlinewidth
+ newpath
+ 0 45 moveto
+ -25 45  7.5
+ -15 20 arctoalt 7.5
+ -15 5 arctoalt 5
+ 15 5 arctoalt 5
+ 15 20 arctoalt 7.5
+ 25 45 arctoalt 7.5 
+ 0 45 arctoalt
+ lineto
+ fillstroke
+ grestore
+} def
+
+/arms_atrest {
+ gsave
+ 1 setlinewidth
+ newpath
+ 20 40 moveto
+ 20 30 4.5 10 90 450 ell
+ 20 20 moveto
+ 20 10 3.5 10 90 450 ell
+-20 40 moveto
+-20 30 4.5 10 90 450 ell
+-20 20 moveto
+-20 10 3.5 10 90 450 ell
+ fillstroke
+ grestore 
+} def
+
+/arms_leftout {
+ gsave
+ 1 setlinewidth
+ newpath
+ 20 40 moveto
+ 20 30 4.5 10 90 450 ell
+ 17.5 17.5 moveto
+ 27.5 17.5 10 3.5 -180 180 ell
+-20 40 moveto
+-20 30 4.5 10 90 450 ell
+-20 20 moveto
+-20 10 3.5 10 90 450 ell
+ fillstroke
+ grestore 
+} def
+
+/arms_bothout {
+ gsave
+ 1 setlinewidth
+ newpath
+ 20 40 moveto
+ 20 30 4.5 10 90 450 ell
+ 17.5 17.5 moveto
+ 27.5 17.5 10 3.5 -180 180 ell
+-20 40 moveto
+-20 30 4.5 10 90 450 ell
+-17.5 17.5 moveto
+-27.5 17.5 10 3.5 0 360 ell
+ fillstroke
+ grestore 
+} def
+
+/hands_atrest {
+ gsave
+ 1 setlinewidth
+ newpath
+ 20 0 moveto
+ 20 -5 5 90 450 arc
+-20 0 moveto
+-20 -5 5 90 450 arc
+ fillstroke
+ grestore 
+} def
+
+/hands_leftout {
+ gsave
+ 1 setlinewidth
+ newpath
+ 37.5 17.5 moveto
+ 42.5 17.5 5 -180 180 arc
+-20 0 moveto
+-20 -5 5 90 450 arc
+ fillstroke
+ grestore 
+} def
+
+/hands_bothout {
+ gsave
+ 1 setlinewidth
+ newpath
+ 37.5 17.5 moveto
+ 42.5 17.5 5 -180 180 arc
+ -37.5 17.5 moveto
+ -42.5 17.5 5 0 360 arc
+ fillstroke
+ grestore 
+} def
+
+/abdomen {
+  gsave
+  1 setlinewidth
+  newpath
+  0 5 moveto
+  15 5 2.5
+  0 -15 arctoalt 5
+  -15 5 arctoalt 2.5
+  0 5 arctoalt
+  lineto
+  fillstroke
+  grestore
+} def
+
+/legs {
+ gsave
+ 1 setlinewidth
+ newpath
+ 10 -0 moveto
+ 10 -17.5 5 17.5 90 450 ell
+ 12.5 -35 moveto
+ 12.5 -52.5 5 17.5 90 450 ell
+-10 -0 moveto
+-10 -17.5 5 17.5 90 450 ell
+-12.5 -35 moveto
+-12.5 -52.5 5 17.5 90 450 ell
+ fillstroke
+ grestore
+} def
+
+/feet {
+ gsave
+ 1 setlinewidth
+ newpath
+ -15 -70 moveto
+ -15 -72.5 7.5 2.5 90 450 ell
+ 15 -70 moveto
+ 15 -72.5 7.5 2.5 90 450 ell
+ fillstroke
+ grestore 
+} def
+
+/ftorso {
+ gsave
+ 1 setlinewidth
+ newpath
+ 0 45 moveto
+ -12 45  7.5
+ -15 27.5 arctoalt 10
+ -12.5 22.5 arctoalt 7.5
+ -11.25 10 arctoalt 5
+ 11.25 10 arctoalt 5
+ 12.5 22.5 arctoalt 7.5
+ 15 27.5 arctoalt 10
+ 12 45 arctoalt 7.5 
+ 0 45 arctoalt
+ lineto
+ fillstroke
+ grestore
+} def
+
+/fabdomen {
+  gsave
+  1 setlinewidth
+  newpath
+  0 10 moveto
+  10 10 2.5
+  15 0 arctoalt 2.5 
+  0 -10 arctoalt 5
+  -15 0 arctoalt 2.5
+  -10 10 arctoalt 2.5
+  0 10 arctoalt
+  lineto
+  fillstroke
+  grestore
+} def
+
+/farms_bothout {
+ gsave
+ 1 setlinewidth
+ newpath
+ 15 42.5 moveto
+ 15 32.5 4.5 10 90 450 ell
+ 15 20 moveto
+ 25 20 10 3.5 -180 180 ell
+-15 42.5 moveto
+-15 32.5 4.5 10 90 450 ell
+-15 20 moveto
+-25 20 10 3.5 0 360 ell
+ fillstroke
+ grestore 
+} def
+
+/fhands_bothout {
+ gsave
+ 1 setlinewidth
+ newpath
+ 35 20 moveto
+ 40 20 5 -180 180 arc
+ -35 20 moveto
+ -40 20 5 0 360 arc
+ fillstroke
+ grestore 
+} def
+
+/farms_rightout {
+ gsave
+ 1 setlinewidth
+ newpath
+ 15 42.5 moveto
+ 15 32.5 4.5 10 90 450 ell
+ 15 22.5 moveto
+ 15 12.5 3.5 10 90 450 ell
+-15 42.5 moveto
+-15 32.5 4.5 10 90 450 ell
+-15 20 moveto
+-25 20 10 3.5 0 360 ell
+ fillstroke
+ grestore 
+} def
+
+/fhands_rightout {
+ gsave
+ 1 setlinewidth
+ newpath
+ 15 2.5 moveto
+ 15 -2.5 5 90 450 arc
+ -35 20 moveto
+ -40 20 5 0 360 arc
+ fillstroke
+ grestore 
+} def
+
+/flegs {
+ gsave
+ 1 setlinewidth
+ newpath
+ 10 -0 moveto
+ 10 -15 5 15 90 450 ell
+ 12.5 -30 moveto
+ 12.5 -45 4.5 15 90 450 ell
+-10 -0 moveto
+-10 -15 5 15 90 450 ell
+-12.5 -30 moveto
+-12.5 -45 4.5 15 90 450 ell
+ fillstroke
+ grestore
+} def
+
+/ffeet {
+ gsave
+ 1 setlinewidth
+ newpath
+ -15 -60 moveto
+ -15 -62.5 7.5 2.5 90 450 ell
+ 15 -60 moveto
+ 15 -62.5 7.5 2.5 90 450 ell
+ fillstroke
+ grestore 
+} def
+
+/hungmung {
+ head 
+ eyes
+ torso
+ arms_leftout
+ abdomen
+ legs
+ feet
+ robe
+ hands_leftout
+ 42.5 32.5 moveto
+ hmchao
+} def
+
+/hmchao {
+ gsave
+ currentpoint translate
+ newpath
+ -10 0 moveto
+ 0 0 10 180 0 arcn
+ 5 0 5 0 180 arc
+ -5 0 5 0 -180 arcn
+ fill
+ gsave
+ newpath
+ 1 setgray
+ -3.75 1.25 moveto
+ -3.75 -1.25 lineto
+ -6.25 -1.25 lineto
+ -6.25 1.25 lineto
+ closepath
+ fill
+ grestore
+ gsave
+ .1 setlinewidth
+ 5 0 translate
+ 0 0.5 moveto
+ 3125 srand
+ /randmax 2 31 exp def
+ 25 {
+  360 25 2 mul div rotate
+  0 rand randmax div 3.75 mul .5 add lineto
+  360 25 2 mul div rotate
+  0 .5 lineto
+ } repeat
+ closepath
+ fill
+ grestore
+ grestore
+} def
+
+/vanvanmojo {
+ head 
+ eyes
+ torso
+ arms_bothout
+ abdomen
+ mojolegs
+ mojofeet
+ mojorobe
+ hands_bothout
+ mojomask
+} def
+
+/mojomask { % a baule goli mask, dancing trickster spirit
+ gsave
+  .5 setlinewidth
+  gsave %hair
+   0 56.25 translate
+   .6 setgray
+   newpath
+   -90 5 270 {
+    /degree exch def
+    degree 90 lt {
+     /altdegree degree 90 sub def
+     degree 0 lt {
+      /downdegree 0 def
+     } {
+      /downdegree degree def
+     } ifelse
+    } {
+     /altdegree degree 90 add def
+     degree 180 gt {
+      /downdegree 180 def
+     } {
+      /downdegree degree def
+     } ifelse
+    } ifelse
+    /temprad 180 degree 90 sub abs sub 12 div def
+    0 0 moveto
+    20 degree cos mul 
+     20 degree sin mul 
+     lineto
+    downdegree 90 lt {
+     20 degree cos mul temprad altdegree cos mul add
+      20 degree sin mul temprad altdegree sin mul add
+      temprad altdegree 180 add downdegree 
+      arcn
+     -30 downdegree 90 add cos mul
+      -30 downdegree 90 add sin mul
+      rlineto
+    } {
+     20 degree cos mul temprad altdegree cos mul add
+      20 degree sin mul temprad altdegree sin mul add
+      temprad altdegree 180 sub downdegree 
+      arc
+     -30 downdegree 90 sub cos mul
+      -30 downdegree 90 sub sin mul
+      rlineto
+    } ifelse
+   } for
+   stroke
+  grestore
+  newpath
+   0 70 moveto
+   0 85 15 -90 75 arc 
+   0 87.5 10 75 -255 arcn
+   0 85 15 105 270 arc 
+  .5 grayfillstroke
+  newpath
+  fillstroke
+  newpath
+   20 56.25 moveto
+   0 56.25 20 0 360 arc
+  .5 grayfillstroke
+  newpath
+   -4 60.25 moveto
+   -4 58.25 2 90 210 arc
+   -4 58.25 2 1 3 sqrt add mul 2 sqrt div sub lineto
+   -4 58.25 2 -30 90 arc
+   4 60.25 moveto
+   4 58.25 2 90 210 arc
+   4 58.25 2 1 3 sqrt add mul 2 sqrt div sub lineto
+   4 58.25 2 -30 90 arc
+  fillstroke
+  newpath
+   0 47.5 moveto
+   7.5 0 rlineto
+   0 -2.5 rlineto
+   -15 0 rlineto
+   0 2.5 rlineto
+   closepath
+  fillstroke
+ grestore
+} def
+
+/mojorobe {
+ gsave
+ .5 setlinewidth
+ newpath
+ 15 -70 moveto
+ 20 -70 5
+ 17.5 0 arctoalt 5
+ 25 45 arctoalt 7.5
+ 10 45 arctoalt 5
+ 0 35 arctoalt 7.5
+ -10 45 arctoalt 5
+ -25 45 arctoalt 7.5
+ -17.5 0 arctoalt 5
+ -35 -25 arctoalt 7.5
+ -35 -40 arctoalt 7.5
+ 0 -70 arctoalt 10
+ 15 -70 arctoalt
+ lineto
+ .75 grayfillstroke
+ grestore
+} def
+
+/mojolegs {
+ gsave
+ 1 setlinewidth
+ newpath
+ 10 -0 moveto
+ 10 -17.5 5 17.5 90 450 ell
+ 12.5 -35 moveto
+ 12.5 -52.5 5 17.5 90 450 ell
+-10 -5 translate
+ -45 rotate
+ 0 5 moveto
+ 0 -12.5 5 17.5 90 450 ell
+ 0 -27.5 translate
+ 45 rotate
+-0 -2.5 moveto
+-0 -20 5 17.5 90 450 ell
+ fillstroke
+ grestore
+} def
+
+/mojofeet {
+ gsave
+ 1 setlinewidth
+ newpath
+ -10 27.5 2 sqrt div sub
+  -42.5 27.5 2 sqrt div sub moveto
+ -10 27.5 2 sqrt div sub
+  -45 27.5 2 sqrt div sub
+  7.5 2.5 90 450 ell
+ 15 -70 moveto
+ 15 -72.5 7.5 2.5 90 450 ell
+ fillstroke
+ grestore 
+} def
+
+/gulik {
+ gulikback
+ gulikbody
+ gulikhead
+ guliklegs
+ gulikitem
+} def
+
+/gulikback {
+ gsave
+ 1 setlinewidth
+ newpath
+ 0 50 moveto
+ 20 50 5
+ 0 77.5 arctoalt 10
+ -20 50 arctoalt 5
+ 0 50 arctoalt
+ lineto
+ fillstroke
+  gsave
+  5 50 translate
+  15 rotate
+  newpath
+  0 0 moveto
+  0 -50 20 50 90 450 ell
+  fillstroke
+  grestore
+  gsave
+  -5 50 translate
+  -15 rotate
+  newpath
+  0 0 moveto
+  0 -50 20 50 90 450 ell
+  fillstroke
+  grestore
+  
+ grestore
+} def
+
+/gulikbody {
+ gsave
+ 1 setlinewidth
+ newpath
+ 0 -35 moveto
+ 0 10 15 45 -90 270 ell  
+ fillstroke
+ grestore
+} def
+
+/gulikhead {
+ gsave
+ 1 setlinewidth
+ 0 45 moveto
+ newpath
+ 0 56.25 5 11.25 -90 270 ell
+ fillstroke
+ newpath
+ -2 40 moveto
+ -3 44 lineto
+ -1 48 lineto
+ 2 40 moveto
+ 3 44 lineto
+ 1 48 lineto
+ stroke
+ newpath
+ -2.5 56.25 moveto
+ -4.5 56.25 2 5 0 360 ell
+  2.5 56.25 moveto
+  4.5 56.25 2 5 -180 180 ell
+ fill 
+ newpath
+ -2 62 moveto
+ -12 62 10 11 0 90 ell
+ -12 -1 20 74 90 180 ell 
+ -32 -72 lineto
+ 2 62 moveto
+ 12 62 10 11 180 90 elln
+ 12 -1 20 74 90 0 elln
+ 32 -72 lineto
+ stroke
+ grestore 
+} def
+
+/guliklegs {
+ gsave
+ 1 setlinewidth
+ -20 -75 moveto
+ -10 -75 lineto
+ -20 -40 lineto
+ -10 0 lineto
+  20 -75 moveto
+  10 -75 lineto
+  20 -40 lineto
+  10 0 lineto
+ 
+  -10 15 moveto
+  -12 -24 rlineto
+  -7.5 26.25 rlineto
+  -8 6 rlineto
+  10 15 moveto
+  24 -12 rlineto
+  19 19 rlineto
+  10 0 rlineto
+
+ -10 30 moveto
+ -24 12 rlineto 
+  0  27 rlineto
+ -6 8 rlineto
+  10 30 moveto
+  7.5 30 rlineto
+  -7.5 26.25 rlineto
+  0 10 rlineto  
+
+ stroke
+ grestore
+} def
+
+/gulikitem {
+ gsave
+ 53 22 translate %wristpoint
+ 1.5 -1.5 scale
+ -2 -2 translate
+ newpath
+ 3 2 moveto
+ 3 3 1 270 360 arc
+ 10 3 lineto
+ 9 3 1 360 270 arcn
+ 3 2 lineto
+ fillstroke
+ newpath
+ 1 15 moveto
+ 7 15 lineto
+ 7 14 1 90 0 arcn
+ 8 3 lineto
+ 9 3 1 180 270 arc
+ 3 2 lineto
+ 3 3 1 270 180 arcn
+ 2 14 lineto
+ 1 14 1 0 90 arc
+ fillstroke
+ newpath
+ 0 14 moveto
+ 1 14 1 180 90 arcn
+ 7 15 lineto
+ 7 14 1 90 180 arc
+ 0 14 lineto
+ fillstroke
+ 
+ grestore
+} def
+
+/zarathud {
+ gsave
+ legs
+ feet
+ torso
+ head
+ eyes
+ arms_atrest
+ robe
+ zarahair
+ zaratablets
+ hands_atrest
+ grestore
+} def
+
+/zarahair {
+ gsave
+  newpath
+  0 61.25 moveto
+  0 56.25 7.5 5 90 0 elln
+  15 65 lineto
+  7.5 60 lineto
+  12.5 70 lineto
+  6.5 62.5 lineto
+  10 75 lineto
+  5.5 65 lineto
+  7.5 77.5 lineto  
+  4 66.25 lineto
+  6.25 78.25 lineto
+  2 66.25 lineto
+  1.25 80 lineto
+
+  0 67.5 lineto
+
+  -1.25 80 lineto
+  -2 66.25 lineto
+  -6.25 78.25 lineto
+  -4 66.25 lineto
+  -7.5 77.5 lineto
+  -5.5 65 lineto
+  -10 75 lineto
+  -6.5 62.5 lineto
+  -12.5 70 lineto
+  -7.5 60 lineto
+  -15 65 lineto
+  0 56.25 7.5 5 180 90 elln
+  fill
+  newpath
+  0 56.25 7.5 11.25 -35 -45 elln
+  5.5 35 lineto
+  4.95 40 lineto
+  4.4 34 lineto
+  3.85 40 lineto
+  3.3 33 lineto
+  2.75 40 lineto
+  2.2 32 lineto
+  1.65 40 lineto
+  1.1 31 lineto
+  0.55 40 lineto
+  0 30 lineto
+  -0.55 40 lineto
+  -1.1 31 lineto
+  -1.65 40 lineto
+  -2.2 32 lineto
+  -2.75 40 lineto
+  -3.3 33 lineto
+  -3.85 40 lineto
+  -4.4 34 lineto
+  -4.95 40 lineto
+  -5.5 35 lineto
+  0 56.25 7.5 11.25 -135 -145 elln
+  closepath
+  fill
+ grestore
+} def
+
+/zaratablets {
+ gsave
+ 0 -75 translate
+ %20 rad, 50 tall
+ newpath
+ 0 0 moveto
+ 0 50 lineto
+ -20 50 20 0 180 arc
+ -40 0 lineto
+ 40 0 lineto
+ 40 50 lineto
+ 20 50 20 0 180 arc
+ 0 0 lineto
+ fillstroke
+ newpath
+ 2 setlinewidth
+ 2 setlinejoin
+ 2 setlinecap
+
+ 25 5 moveto %o
+ 25 15 lineto
+ 20 15 lineto
+ 20 5 lineto
+ 25 5 lineto
+ -5 15 moveto %m
+ -5 10 lineto
+ -10 15 lineto
+ -10 5 lineto
+ -15 15 lineto
+ -15 15 moveto %a
+ -25 5 lineto
+ -25 15 lineto
+ -20 10 lineto
+ -30 15 moveto %n
+ -30 10 lineto
+ -35 15 lineto
+ -35 5 lineto
+ 25 25 moveto %o
+ 30 30 lineto
+ 25 35 lineto
+ 20 30 lineto
+ 25 25 lineto
+ 15 35 moveto %f
+ 15 30 lineto
+ 10 30 lineto
+ 15 30 lineto
+ 10 25 lineto
+ -5 35 moveto %f
+ -5 25 lineto
+ -15 25 lineto
+ -5 30 moveto
+ -10 30 lineto
+ -10 35 moveto %a
+ -15 30 lineto
+ -15 35 lineto
+ -10 35 lineto
+ -20 35 moveto %i
+ -20 30 lineto
+ -25 35 moveto %t
+ -25 25 lineto
+ -20 25 lineto
+ -25 25 lineto
+ -30 35 moveto %h
+ -30 25 lineto
+ -30 30 lineto
+ -35 30 lineto
+ -35 25 lineto
+ -35 35 lineto
+ 
+ stroke  
+ grestore
+} def
+
+/malaclypse {
+ torso
+ arms_leftout
+ abdomen
+ legs
+ feet
+ robe
+ malsign
+ hands_leftout
+ head
+ eyes 
+ malhair
+} def
+
+/malhair {
+ gsave
+  newpath
+   -3 11.25 3 sqrt mul 2 div 56.25 add moveto
+   0 56.25 7.5 11.25 120 180 ell
+   -3 11.25 3 sqrt mul 2 div 56.25 add 10 arcbetweento
+  .9 grayfillstroke
+  newpath
+   3 11.25 3 sqrt mul 2 div 56.25 add moveto
+   0 56.25 7.5 11.25 60 0 elln
+   3 11.25 3 sqrt mul 2 div 56.25 add -10 arcbetweento
+  .9 grayfillstroke
+ grestore
+} def
+
+/malsign {
+ gsave
+ -20 -5 translate
+ -5 rotate
+ .5 setlinewidth
+ newpath
+ 0 55 moveto
+ -27.5 0 rlineto
+ 0 30 rlineto
+ 55 0 rlineto
+ 0 -30 rlineto
+ -27.5 0 rlineto
+ fillstroke
+ 2 setlinewidth
+ newpath
+ 0 -15 moveto
+ 0 105 rlineto
+ stroke
+ grestore
+ 
+} def
+
+/cardfunc {
+ [{zip} {one} {two} {three} {four} 
+  {onomatopoeia} {day} {season} {cow} {apostle}]
+    cardnum get exec
+} def
+
+%all trump cards
+%!
+
+%begin trumps
+
+/sacredcow { % a sacred cow
+ gsave
+  gsave
+  0 -75 moveto
+  9 dup scale
+  drawcow
+  grestore
+  cowballoon
+  cowmu
+ grestore
+ (The Sacred Cow) /trumptitle exch def
+} def
+
+/cowballoon {
+ gsave
+  1 setlinewidth
+  newpath
+  37.5 20  moveto
+  0 62.5 50 25 -60 270 ell
+  closepath
+  fillstroke 
+ grestore
+} def
+
+/cowmu {
+ %wu2, with correct strokes.
+ gsave
+ 0 62.5 translate
+ newpath
+ -20 12 moveto
+ -12 20 lineto
+ -16 16 moveto
+ 18 16 lineto
+ -15 14 moveto
+ -15 -8 lineto
+ -5 14 moveto
+ -5 -8 lineto
+ 5 14 moveto
+ 5 -8 lineto
+ 15 14 moveto
+ 15 -8 lineto
+ -18 4 moveto
+ 18 4 lineto
+ -20 -8 moveto
+ 20 -8 lineto
+ -15 -10 moveto
+ -20 -20 lineto
+ -12 -10 moveto
+ -7  -20 lineto
+ 1.5 -10 moveto
+ 6.5 -20 lineto
+ 15 -10 moveto
+ 20 -20 lineto
+ stroke
+ grestore
+} def
+
+/pope { % a pope
+ gsave
+  0 -20 translate
+  fabdomen
+  flegs
+  ffeet
+  ftorso
+  farms_rightout
+  poperobe
+  head
+  eyes
+  popehair
+  popehat
+  popestaff
+  fhands_rightout
+ grestore
+ (A Pope) /trumptitle exch def
+} def
+
+/popehair {
+ gsave
+  gsave
+   newpath
+   0 67.5 moveto
+   0 56.25 7.5 11.25 90 -270 elln
+   100 67.5 lineto
+   0 -150 lineto
+   -100 67.5 lineto
+   eoclip
+   newpath
+   1 setlinewidth
+   7.5 56.25 moveto
+   7.5 40 lineto
+   10 40 2.5 10 180 270 ell
+   6.25 30 3.75 1.25 360 180 elln
+   2.5 40 2.5 10 270 360 ell
+
+   5 40 lineto
+   -7.5 40 12.5 16.25 0 90 ell
+   0 56.25 7.5 11.25 180 0 elln
+   fill
+  grestore
+  newpath
+  7.5 56.25 moveto
+  7.5 63.75 7.5 7.5 270 180 elln
+  -7.5 63.75 7.5 7.5 360 270  elln
+  0 56.25 7.5 11.25 180 0 elln
+  fill
+ grestore
+} def
+
+/popehat {
+ newpath
+ 7 62 moveto
+ 7 65 lineto
+ -7 65 lineto
+ 7 65 lineto
+ /tempconst 7 3 sqrt 2 sqrt sub div def
+ 7 tempconst 3 sqrt mul sub 65 tempconst add tempconst 2 mul -30 45 arc
+ -7 tempconst 3 sqrt mul add 65 tempconst add tempconst 2 mul 135 210 arc
+% -7 65 14 28 0 60 ell
+% 7 65 14 28 120 180 ell
+ -7 65 lineto
+ -7 62 lineto
+ closepath
+ fillstroke
+ newpath
+ 5 90 moveto
+ 0 90 5 3 360 180 elln
+ 0 90 5 180 270 arc
+ 0 87 7.5 2 270 180 elln
+ -7.5 84.5 1 2.5 90 -90 elln
+ 0 82 7.5 2 180 90 elln
+ 0 79 5 90 180 arc
+ 0 79 5 3 180 0 elln
+ 0 79 5 0 90 arc
+ 0 82 7.5 2 90 0 elln
+ 7.5 84.5 1 2.5 270 90 elln
+ 0 87 7.5 2 360 270 elln
+ 0 90 5 270 360 arc
+ fill
+} def
+
+/popestaff {
+ gsave
+ 2 setlinewidth
+ newpath
+ -40 -65 moveto
+ -40 30 lineto
+ -40 30 2 90 450 arc
+ -30 45 10 180 120 arcn
+ -30 10 sub 45 10 3 sqrt mul add 10 -30 180 arc
+ stroke
+ grestore
+} def
+
+/poperobe {
+ gsave
+ .5 setlinewidth
+ newpath
+ 0 45 moveto
+ -12 45  7.5
+ -15 27.5 arctoalt 10
+% -12.5 22.5 arctoalt 7.5
+ -11.25 10 arctoalt 5
+ -15 0 arctoalt 2.5
+ -18.5 -60 arctoalt 5
+ 18.5 -62.5 arctoalt 5
+ 15 0 arctoalt 5
+ 11.25 10 arctoalt 5
+% 12.5 22.5 arctoalt 7.5
+ 15 27.5 arctoalt 10
+ 12 45 arctoalt 7.5 
+ 0 45 arctoalt
+ lineto
+ fillstroke
+ grestore
+} def
+
+/initiate { % a hand reading
+ gsave
+  %draw palm
+  newpath
+  -20 0 moveto
+  50 0 lineto 
+  30 -75 lineto
+  fillstroke
+  %draw ring finger
+  gsave
+   25 -45 translate
+   -30 rotate
+   newpath
+    7.5 0 moveto
+    0 0 7.5 15 0 360 ell
+   fillstroke
+  grestore
+  %draw pinky
+  gsave
+   35 -55 translate
+   -30 rotate
+   newpath
+    7.5 0 moveto
+    0 0 7.5 15 0 360 ell
+   fillstroke
+  grestore
+  %draw book
+  drawinitbook
+  currentlinewidth 3 mul setlinewidth
+  55 45 160 pagepa moveto
+  35 45 160 pagepa lineto
+  45 45 160 pagepa moveto
+  45 25 160 pagepa lineto
+  stroke
+  currentlinewidth 3 div setlinewidth
+  45 -2.5 22.5 {
+   /lineheight exch def
+   30 lineheight 160 pagepa moveto
+   5 lineheight 160 pagepa lineto
+  } for
+  20 -2.5 -45 {
+   /lineheight exch def
+   55 lineheight 160 pagepa moveto
+   5 lineheight 160 pagepa lineto
+  } for 
+  45 -2.5 -45 {
+   /lineheight exch def
+   55 lineheight 60 pagepa moveto
+   5 lineheight 60 pagepa lineto
+  } for 
+  stroke
+  %draw thumb
+  gsave
+  -22.5 -42.5 translate
+  -30 rotate
+  15 -10 moveto
+  0 0 10 35 0 270 ell
+  fillstroke
+  grestore  
+ grestore
+ (The Initiate) /trumptitle exch def
+} def
+
+/pagepa { %x %y %angle pagepointadjust
+ /angle exch def
+ /y exch def
+ /x exch def
+ x angle cos mul
+ y x angle sin mul 2.5 div add
+} def
+
+/drawinitbook {
+ gsave
+  2.5 dup scale
+  currentlinewidth 2 mul setlinewidth
+  175 drawbookpage
+  20 drawbookpage
+  currentlinewidth 5 div setlinewidth
+  175 -5 160 { drawbookpage } for 
+  25 5 60 { drawbookpage } for
+  newpath
+  0 20 moveto
+  0 -20 lineto
+  stroke  
+ grestore
+} def
+
+/drawbookpage { % angle drawbookpage -
+ /angle exch def
+ gsave
+  /xdim angle cos 25 mul def
+  /ydim angle sin 2.5 div 25 mul def
+  newpath
+  0 20 moveto
+  xdim 20 ydim add lineto
+  xdim -20 ydim add lineto
+  0 -20 lineto
+  fillstroke
+ grestore 
+} def
+
+/illuminate { % a hand writing
+ gsave
+  %draw book
+  drawillubook
+  newpath
+  45 -2.5 -45 {
+   /lineheight exch def
+   55 lineheight 150 pagepa moveto
+   5 lineheight 150 pagepa lineto
+  } for 
+  stroke 
+  gsave
+   currentlinewidth 3 mul setlinewidth
+   newpath
+   5 45 20 pagepa moveto
+   25 45 20 pagepa lineto
+   5 45 20 pagepa moveto
+   5 25 20 pagepa lineto
+   5 35 20 pagepa moveto
+   15 35 20 pagepa lineto
+   5 25 20 pagepa moveto
+   25 25 20 pagepa lineto
+   stroke
+  grestore
+  newpath
+  45 -2.5 22.5 {
+   /lineheight exch def
+   30 lineheight 20 pagepa moveto
+   55 lineheight 20 pagepa lineto
+  } for 
+  20 -2.5 -15 {
+   /lineheight exch def
+   5 lineheight 20 pagepa moveto
+   55 lineheight 20 pagepa lineto
+  } for 
+  5 -17.5 20 pagepa moveto
+  30 -17.5 20 pagepa lineto
+  stroke 
+  %draw hand. needs work.
+  %palm and index
+  gsave
+   -10 20 translate
+   -135 rotate
+   newpath
+    85 30 moveto
+    60 15 lineto
+    32 10 lineto
+    30 -15 lineto
+    10 -10 lineto
+    12.5 -20 lineto
+    0 0 7.5 40 0 270 ell
+    40 -40 lineto
+    10 -45 lineto
+    5 -40 lineto
+    40 -40 lineto
+    60 -30 lineto
+    90 0 lineto
+   fillstroke
+  grestore
+  %pen
+  newpath
+  30 -17.5 20 pagepa moveto
+  -70 30 lineto
+  -75 25 lineto
+  closepath
+  fill
+  %thumb
+  gsave
+   -20 0 translate
+   -75 rotate
+   newpath
+   15 -20 moveto
+   15 -15 lineto
+   0 0 10 25 0 225 ell
+   
+   fillstroke
+  grestore
+ grestore
+ (The Illuminate) /trumptitle exch def
+} def
+
+/drawillubook {
+ gsave
+  2.5 dup scale
+  currentlinewidth 2 mul setlinewidth
+  170 drawbookpage
+  5 drawbookpage
+  currentlinewidth 5 div setlinewidth
+  172.5 -2.5 150 { drawbookpage } for 
+  7.5 2.5 20 { drawbookpage } for
+  newpath
+  0 20 moveto
+  0 -20 lineto
+  stroke  
+ grestore
+} def
+
+
+
+/believer { % a sheep
+ gsave
+  0 -20 translate
+  newpath %head
+   -50 5 moveto
+   -65 10 10
+   -80 -20 arctoalt 5
+   -50 -5 arctoalt
+   lineto
+  fillstroke
+  newpath %ear
+   -50 5 moveto
+   -55 15 2.5
+   -60 15 arctoalt 2.5
+   -60 10 arctoalt 2.5
+   -55 5 arctoalt
+   lineto
+  fillstroke
+  newpath
+   -62.5 0 moveto
+   -62.5 0 2 0 360 arc
+  fill
+  newpath %leg
+   -40 -20 moveto
+   -5 -12.5 rlineto
+   2.5 -12.5 rlineto
+   5 0 rlineto
+   -2.5 12.5 rlineto
+   5 12.5 rlineto
+  fillstroke
+  newpath %leg
+   -37.5 -21.25 moveto
+   0 -25 rlineto
+   5 0 rlineto
+   0 25 rlineto
+  fillstroke
+  newpath %leg
+   30 -20 moveto
+   0 -25 rlineto
+   5 0 rlineto
+   0 25 rlineto
+  fillstroke
+  newpath %leg
+   32.5 -21.25 moveto
+   0 -12.5 rlineto
+   0 -12.5 rlineto
+   5 0 rlineto
+   0 12.5 rlineto
+   0 12.5 rlineto
+  fillstroke
+  %fleece
+  9827 srand % year of X-Day
+  625 {
+   /theta rand randmax div 360 mul def
+   /dist rand randmax div 25 mul def
+   theta sin dist mul 2 mul 
+    theta cos dist mul  believercurl
+  } repeat
+ grestore
+ (The Believer) /trumptitle exch def
+} def
+
+/believercurl { % x y believercurl -
+ gsave
+  translate
+  rand randmax div 360 mul rotate
+  .9 setgray
+  newpath
+   5 0 moveto
+   0 0 5 0 360 arc
+  fill
+  0 setgray
+  newpath
+   5 0 moveto
+   0 0 5 0 180 arc
+  stroke  
+ grestore
+} def 
+
+/skeptic { % a dragon
+ gsave
+  newpath %back wing
+   20 -10 -20 -10
+   60 30 -95
+   -25 100 -45
+   -22.5 55 -45
+   -20 15 -55
+   skepticwing
+  .7 grayfillstroke
+  newpath % fore left foot 
+   20 -24 moveto
+   20 -34 10 10 90 0 elln
+   20 -34 10 20 0 -45 elln
+   32.5 -34 15 2 sqrt mul sub lineto
+   -25 0 rlineto
+   20 -34 10 20 225 180 elln
+  .7 grayfillstroke
+  newpath %rear left foot
+   -17.5 -24 moveto
+   -17.5 -34 10 90 215 arc
+   -17.5 10 2 sqrt mul sub 
+    -34 10 2 sqrt mul sub 
+    10 45 -45 arcn
+   -2.5 -34 15 2 sqrt mul sub lineto
+   -17.5 -39 10 15 -45 90 ell
+  .7 grayfillstroke
+  newpath % body
+   -25 -25 moveto
+   0 -25 25 15 -180 180 ell
+  .8 grayfillstroke
+  newpath %tail
+   0 -5 moveto
+   0 -40 70 35 90 270 ell
+   0 -45 70 30 270 360 ell
+   0 -45 70 25 0 -90 elln
+   0 -42.5 60 27.5 270 180 elln
+   -35 -42.5 25 17.5 180 90 elln
+   -35 -40 15 15 90 0 elln
+  .8 grayfillstroke  
+  newpath %rear foot
+   -20 -25 moveto
+   -20 -35 10 90 215 arc
+   -20 10 2 sqrt mul sub 
+    -35 10 2 sqrt mul sub 
+    10 45 -45 arcn
+   -5 -35 15 2 sqrt mul sub lineto
+   -20 -40 10 15 -45 90 ell
+  .8 grayfillstroke
+  newpath % fore foot - bottom
+   27.5 -35 moveto
+   17.5 -35 10 20 0 -45 elln
+   30 -35 15 2 sqrt mul sub lineto
+   -25 0 rlineto
+   17.5 -35 10 20 225 180 elln
+  .8 grayfillstroke
+  newpath %neck and head
+   0 -5 moveto
+   0 -30 70 25 90 0 elln
+   10 -30 60 25 0 -90 elln
+   -8.75 -58.75 lineto
+   7.5 -52.5 lineto
+   -10 -57.5 lineto
+   15 -45 -30 arcbetweento
+   20 -40 lineto
+   17.5 -47.5 lineto
+   17.5 -32.5 35 15 -90 0 ell
+   35 -32.5 17.5 7.5 0 90 ell
+   35 -35 12.5 10 90 180 ell
+  .8 grayfillstroke
+  newpath % fore foot - top
+   27.5 -35 moveto
+   17.5 -35 10 10 0 180 ell
+  .8 grayfillstroke
+  newpath % front wing
+   18 -10 -22 -10
+   55 45 -85
+   -60 55 -35
+   -45 30 -25
+   -35 5 -25
+   skepticwing
+  .8 grayfillstroke
+  gsave %eye
+   newpath
+    9 -49 translate
+    0 0 moveto
+    20 rotate
+    0 0 3 1.5 0 360 ell
+   fill
+  grestore
+ grestore
+ (The Skeptic) /trumptitle exch def
+} def
+
+/skepticwing { % yes, I use it twice, yes, it's needlessly large. Take it up with the dragon.
+  /wngr4 exch def
+  /tipy3 exch def
+  /tipx3 exch def
+  /wngr3 exch def
+  /tipy2 exch def
+  /tipx2 exch def
+  /wngr2 exch def
+  /tipy1 exch def
+  /tipx1 exch def
+  /wngr1 exch def
+  /elbowy exch def
+  /elbowx exch def
+  /basey exch def
+  /basex exch def
+  /starty exch def
+  /startx exch def
+  startx starty moveto
+  elbowx elbowy wngr1 arcbetweento
+  tipx3 tipy3 lineto
+  elbowx elbowy lineto
+  tipx2 tipy2 lineto
+  elbowx elbowy lineto
+  tipx1 tipy1 lineto
+  tipx2 tipy2 wngr2 arcbetweento
+  tipx3 tipy3 wngr3 arcbetweento
+  basex basey wngr4 arcbetweento  
+} def
+
+/flower { % a 5-petaled flower
+ 5 srand
+ /radius1 25 def
+ /radius2 radius1 2 sqrt 1 sub mul def 
+ /center2 radius1 radius2 sub 2 sqrt div def
+ gsave
+  newpath
+   5 0 moveto
+   0 0 5 0 360 arc 
+  .6 grayfillstroke
+  gsave 
+   5 {
+    gsave
+     0 30 translate
+     .75 1 scale
+     newpath
+      0 radius1 -1 mul moveto
+      0 0 radius1 -90 45 arc
+      center2 center2 radius2 45 180 arc   
+      center2 -1 mul center2 radius2 0 135 arc   
+      0 0 25 135 270 arc 
+     .8 grayfillstroke
+    grestore
+    360 5 div rotate
+   } repeat
+  grestore
+  gsave
+   25 {
+    gsave
+     1 setgray
+     newpath
+      0 rand randmax div 5 mul moveto
+      0 rand randmax div 25 mul lineto
+      currentpoint translate
+     stroke
+     .6 setgray
+     newpath
+      1 0 moveto
+      0 0 1 0 360 arc
+     fill
+    grestore
+    360 25 div rotate     
+   } repeat
+  grestore
+  .7 setgray
+  newpath
+   3 0 moveto
+   0 0 3 0 360 arc
+  fill
+ grestore
+ (The Flower) /trumptitle exch def
+} def
+
+/trout { %a fish with a hat on
+ gsave
+  /const1 20 2 sqrt mul def
+  2 .75 scale
+  .5 setgray
+  newpath
+  17.5 -5 moveto
+  05 0 20 10 85 arc
+  00 30 lineto
+  05 0 20 115 135 arc
+  05 const1 sub 0 const1 add 20 -45 -90 arcn
+  -32.5 20 lineto
+  -31.25 0 lineto
+  -32.5 -20 lineto
+  05 const1 sub 0 const1 sub 20 90 70 arcn
+ % -19 -12.5 lineto
+ % -17.5 -22.5 lineto
+  05 const1 sub 0 const1 sub 20 50 45 arcn
+  05 0 20 225 235 arc
+  -7.5 -22.5 lineto
+  05 0 20 260 350 arc
+  closepath
+  gsave
+   fill
+  grestore
+  gsave
+   .5 4 3 div scale
+   0 setgray
+   stroke
+  grestore
+  newpath
+  0 setgray
+  16 7 moveto
+  15 7 .75 2 0 360 ell
+  fill
+  0 setgray
+  20  18 moveto
+  15  18 lineto
+  5   18 10 79 3 div 0 180 ell
+  -10 18 lineto
+  closepath
+  gsave
+   2 setlinewidth
+   stroke
+  grestore
+  fill
+ grestore
+ (The Trout) /trumptitle exch def
+} def
+
+/conspiracy { %silhouettes around a candle
+ gsave
+  gsave
+   -1 1 scale
+   -50 20 translate
+   5 {
+    head
+    robe
+    25 0 translate
+   } repeat
+  grestore
+  gsave
+   0 -10 translate
+   consptable
+   conspcandle
+  grestore
+ grestore
+ (Conspiracy) /trumptitle exch def
+} def
+
+/consptable {
+ newpath
+  65 -16 moveto
+  65 -80 lineto
+  61 -80 lineto
+  61 -16 lineto
+  61 -80 lineto
+  60 -76 lineto
+  60 -12 lineto
+ fillstroke
+ newpath
+  -65 -16 moveto
+  -65 -80 lineto
+  -61 -80 lineto
+  -61 -16 lineto
+  -61 -80 lineto
+  -60 -76 lineto
+  -60 -12 lineto
+ fillstroke
+ newpath
+  57 12 moveto
+  57 -52 lineto
+  53 -52 lineto
+  53 12 lineto
+  53 -52 lineto
+  52 -48 lineto
+  52 16 lineto
+ fillstroke
+ newpath
+  -57 12 moveto
+  -57 -52 lineto
+  -53 -52 lineto
+  -53 12 lineto
+  -53 -52 lineto
+  -52 -48 lineto
+  -52 16 lineto
+ fillstroke
+ newpath
+ 60 20 moveto
+ -60 20 lineto
+ -70 -20 lineto
+ 70 -20 lineto
+ 70 -22 lineto
+ -70 -22 lineto
+ -70 -20 lineto
+ 70 -20 lineto
+ closepath
+ fillstroke
+} def
+
+/conspcandle {
+  newpath
+  10 0 moveto
+  0 0 10 5 0 360 ell
+  0 0 10 6 0 -180 elln
+  fillstroke
+  newpath
+  2 -1 moveto
+  2 10 lineto
+  0 10 2 1 360 180 elln
+  -2 -1 lineto
+  0 -1 2 1 180 360 ell
+  fillstroke
+  newpath 
+  0 17 moveto
+  /cosa 1 5 div def 
+  /tmpangle cosa acos def
+   %90 cosa 1 cosa 2 exp sub sqrt div 1 atan sub def
+  0 12 1 90 tmpangle sub 90 tmpangle add arcn
+  0 17 lineto
+  closepath
+  fillstroke
+} def
+
+/joker { % a traditional joker
+ gsave
+ head 
+ farms_bothout 
+ ftorso
+ fabdomen
+ flegs
+ ffeet
+ skirt
+ vest
+ fhands_bothout
+ jokereyes
+ jokerhair
+ gsave
+  0 17.5 translate
+   gsave
+    60 rotate
+    -7.5 35 moveto
+    sweet
+   grestore
+   gsave
+    30 rotate
+    -7.5 45 moveto
+    boom
+   grestore
+   gsave
+    0 rotate
+    -7.5 55 moveto
+    pungent
+   grestore
+   gsave
+    -30 rotate
+    -7.5 45 moveto
+    prickle
+   grestore
+   gsave
+    -60 rotate
+    -7.5 35 moveto
+    orange
+   grestore
+  grestore
+ grestore
+ (Joker) /trumptitle exch def
+} def
+
+
+/jokerhair { %empty for now
+ gsave
+  gsave
+   newpath
+   0 67.5 moveto
+   0 56.25 7.5 11.25 90 -270 elln
+   100 67.5 lineto
+   0 -150 lineto
+   -100 67.5 lineto
+   eoclip
+   newpath
+   7.5 56.25 moveto
+   8.25 47.625 lineto
+   -12.5 50 lineto
+   0 56.25 7.5 11.25 180 0 elln
+   fill
+  grestore
+  newpath
+  0 67.5 moveto
+  0 56.25 7.5 11.25 90 45 elln
+  -12.5 50 lineto
+  0 56.25 10 11.25 130 90 elln
+  fill
+ grestore
+} def
+
+/jokereyes { 
+ gsave
+  1 setlinewidth
+  newpath
+  4 56.25 moveto
+  3 56.25 1 0 360 arc
+  -4 56.25 moveto
+  -3 56.25 1 1 -180 180 ell
+  2 60 moveto
+  4 61 lineto
+  -2 60 moveto
+  -4 61 lineto
+  stroke
+ grestore
+} def
+
+/vest {
+ gsave
+ .5 setlinewidth
+ newpath
+ 0.625 10 moveto
+ 1.25 30 lineto
+ 0 35 lineto
+ -5 45  2.5
+ -12 45 arctoalt 7.5
+ -15 27.5 arctoalt 10
+% -12.5 22.5 arctoalt 7.5
+ -11.25 9 arctoalt 0
+ 0.625 10 arctoalt 0
+ 11.25 9 arctoalt 0
+% 12.5 22.5 arctoalt 7.5
+ 15 27.5 arctoalt 10
+ 12 45 arctoalt 7.5 
+ 5 45 arctoalt 2.5
+ 0 35 arctoalt
+ lineto
+ gsave
+ .75 setgray
+ fill
+ grestore
+ 0 setgray
+ stroke
+ grestore
+} def
+
+/skirt {
+ gsave
+ newpath
+  0 10 moveto
+  10 10 2.5
+  15 0 arctoalt 2.5 
+  20 -50 arctoalt 1.25
+  -20 -55 arctoalt 1.25
+  -15 0 arctoalt 2.5
+  -10 10 arctoalt 2.5
+  0 10 arctoalt
+  lineto
+ fill
+ grestore
+} def
+ 
+/synchronicity { %a net of lights around a face
+ gsave
+ head
+ synceyes
+ hands_bothout
+ feet
+ 3569 srand % 1000 + catalog number of police album
+ /lightnum 17 def
+ /xmax 60 def
+ /ymax 90 def
+ /xarray lightnum array def
+ /yarray lightnum array def
+ %populate array
+ 0 1 lightnum 1 sub {
+  /index exch def
+  xarray index rand randmax div xmax mul 2 mul xmax sub put
+  yarray index rand randmax div ymax mul 2 mul ymax sub put
+ } for
+ %draw connections
+ lightnum 2.5 mul cvi {
+  newpath
+  /index rand randmax div lightnum mul cvi def
+  xarray index get
+  yarray index get
+  moveto
+  /index rand randmax div lightnum mul cvi def
+  xarray index get
+  yarray index get
+  lineto
+  stroke
+ } repeat
+ % draw lights
+ 0 1 lightnum 1 sub {
+  /index exch def
+  xarray index get
+  yarray index get
+  synclight
+ } for
+ grestore
+ (Net of Synchronicity) /trumptitle exch def
+} def
+
+/synclight {
+ /y exch def
+ /x exch def
+ gsave
+  x y translate
+  10 0 moveto
+  0 0 10 0 360 arc
+  fillstroke
+  basefont 10 scalefont setfont
+  /tempstring rand randmax div 36 dup mul mul cvi 36 3 string cvrs def
+  tempstring stringwidth pop -2 div -5 moveto
+  tempstring show
+ grestore
+} def
+
+/synceyes { 
+ gsave
+  1 setlinewidth
+  newpath
+  4 56.25 moveto
+  3 56.25 1 0 360 arc
+  -4 56.25 moveto
+  -3 56.25 1 1 -180 180 ell
+%  2 60 moveto
+%  4 61 lineto
+%  -2 60 moveto
+%  -4 61 lineto
+  stroke
+ grestore
+} def
+
+/discordiandeck { %the deck itself
+ gsave
+  3159 srand %year deck discovered
+ /randmax 2 31 exp def
+  73 {
+   gsave
+    rand randmax div 360 mul rotate
+    rand randmax div 60 mul 0 translate
+    rand randmax div 360 mul rotate
+    0 0 moveto
+    ddcard
+    
+   grestore
+  } repeat
+ grestore
+ (This Discordian Deck) /trumptitle exch def
+} def
+
+/ddcard{
+ gsave
+  currentpoint translate
+  newpath
+  1 20 div dup scale
+  cardwidth -1 mul cardheight -1 mul moveto
+  cardwidth -1 mul cardheight lineto
+  cardwidth cardheight lineto
+  cardwidth cardheight -1 mul lineto
+  closepath
+  gsave 
+   fillstroke
+  grestore
+  gsave
+   2 dup scale
+   backpattern
+  grestore  
+ grestore
+} def
+
+/bigbang {
+ gsave
+ 0 setlinewidth
+ 3093 srand %year hypothesis made
+ /randmax 2 31 exp def
+ newpath
+ 10 {
+  /radius rand randmax div 65 mul def
+  radius 0 moveto
+  0 0 radius 0 360 arc
+ } repeat
+ eofill
+ newpath
+ 0 10 moveto
+ 50 {
+  360 50 2 mul div rotate
+  0 rand randmax div 65 mul 10 add lineto
+  360 50 2 mul div rotate
+  0 10 lineto
+ } repeat
+ closepath
+ fillstroke
+ grestore
+ (The Big Bang) /trumptitle exch def
+} def
+
+/greatpyramid {
+ gsave
+  newpath
+  cardwidth -2 div 1 add 0 moveto
+  cardwidth 2 div 1 sub 0 lineto
+  stroke
+  anypyramid
+  gsave
+   0 -25 translate
+   .25 dup scale
+   anypyramid
+  grestore
+  gsave
+   -22.5 -26.5 translate
+   .25 dup scale
+   anypyramid
+  grestore
+  gsave
+   -45 -27 translate
+   .25 dup scale
+   anypyramid
+  grestore
+ grestore
+ (The Great Pyramid) /trumptitle exch def
+} def
+
+/anypyramid {
+  newpath
+  -5 25 moveto
+  40 -20 lineto
+  -35 -25 lineto
+  closepath
+  fillstroke
+  newpath
+  -5 25 moveto
+  -35 -25 lineto
+  -40 -20 lineto
+  closepath
+  fill
+} def
+/radioactivity {
+ gsave
+ newpath
+ 10 0 moveto
+ 0 0 10 0 360 arc
+ fill
+ 3 {
+  newpath
+  20 0 moveto
+  50 0 lineto
+  0 0 50 0 60 arc
+  0 0 20 60 0 arcn
+  fill
+  120 rotate
+ } repeat
+ grestore
+ (Radioactivity) /trumptitle exch def
+} def
+
+/towerofbabel {
+ gsave
+  0 cardheight -2 div 40 add translate
+  -90 rotate
+  gsave
+  h-width 0 mul h-height 1 mul translate
+  h-heh h-beth h-heh h-word
+  h-nun h-resh h-daleth h-heh h-word
+  currentlinewidth 2 mul setlinewidth
+  h-waw h-nun h-beth h-lamedh h-heh h-word
+  currentlinewidth 2 div setlinewidth
+  h-shin h-mem2 h-word
+  grestore
+  gsave
+  h-width 0 mul h-height -.5 mul translate
+  h-sin h-peh h-taw h-mem2 h-word
+  h-aleph h-shin h-resh h-word
+  h-lamedh h-aleph 10 rotate h-word
+  h-yod h-shin h-mem1 h-ayin h-waw h-word
+  grestore
+  gsave
+  h-width 0 mul h-height -2 mul translate
+  h-aleph h-yod h-shin h-word h-word
+  h-sin h-peh h-taw h-word 30 rotate h-word
+  h-resh h-ayin h-heh h-waw h-word
+  grestore
+ grestore
+ (The Tower of Babel) /trumptitle exch def
+} def
+
+/h-height 15 def
+/h-width -8 def
+/h-space -4 def
+
+/h-word {
+ h-width 2 div h-space add 0 translate
+} def 
+
+/h-aleph {
+ newpath
+ 0 0 moveto
+ h-width h-height lineto
+ h-width .3 mul h-height moveto
+ h-width .3 mul h-height .75 mul 
+  h-width .3 mul h-height .25 mul
+  90 -90 ell
+ h-width .7 mul 0 moveto
+ h-width .7 mul h-height .25 mul 
+  h-width .3 mul h-height .25 mul
+  -90 90 ell
+ stroke
+ h-width h-space add 0 translate
+} def
+
+/h-beth {
+ newpath
+ 0 0 moveto
+ h-width 0 lineto
+ h-width .3 mul 0 moveto
+ h-width .3 mul h-height lineto
+ h-width h-height lineto
+ stroke
+ h-width h-space add 0 translate
+} def
+
+/h-daleth {
+ newpath
+ h-width .3 mul 0 moveto
+ h-width .3 mul h-height lineto
+ 0 h-height moveto
+ h-width h-height lineto
+ stroke
+ h-width h-space add 0 translate
+} def
+
+/h-heh {
+ newpath
+ 0 0 moveto
+ 0 h-height lineto
+ h-width h-height lineto
+ h-width 0 moveto
+ h-width h-height .7 mul lineto
+ stroke
+ h-width h-space add 0 translate
+} def
+
+/h-waw {
+ newpath
+ h-width .2 mul h-height moveto
+ 0 h-height lineto
+ 0 0 lineto
+ stroke
+ h-width .2 mul h-space add 0 translate 
+} def
+
+/h-yod {
+ newpath
+ h-width .2 mul h-height moveto
+ 0 h-height lineto
+ 0 h-height .6 mul lineto
+ stroke
+ h-width .2 mul h-space add 0 translate 
+} def
+
+/h-lamedh {
+ newpath
+ h-width h-height 1.2 mul moveto
+ h-width h-height lineto
+ 0 h-height lineto
+ 0 h-height .5 mul lineto
+ h-width .5 mul 0 lineto
+ stroke
+ h-width h-space add 0 translate 
+} def
+
+/h-mem1 {
+ newpath
+ h-width h-height moveto
+ h-width 0 lineto
+ h-width h-height .7 mul moveto
+ h-width .7 mul h-height lineto
+ 0 h-height lineto
+ 0 0 lineto
+ h-width .7 mul 0 lineto
+ stroke
+ h-width h-space add 0 translate 
+} def
+
+/h-mem2 {
+ newpath
+ h-width h-height moveto
+ 0 h-height lineto
+ 0 0 lineto
+ h-width .8 mul 0 lineto
+ h-width .8 mul h-height lineto
+ stroke
+ h-width h-space add 0 translate
+} def
+
+/h-nun {
+ newpath
+ h-width .2 mul h-height moveto
+ 0 h-height lineto
+ 0 0 lineto
+ h-width .5 mul 0 lineto
+ stroke
+ h-width .5 mul h-space add 0 translate
+} def
+
+/h-ayin {
+ newpath
+ h-width .2 mul h-height moveto
+ 0 h-height lineto
+ 0 0 lineto
+ h-width 0 lineto
+ h-width .7 mul h-height moveto
+ h-width .5 mul h-height lineto
+ h-width .5 mul 0 lineto
+ stroke
+ h-width h-space add 0 translate
+} def
+
+/h-peh {
+ newpath
+ h-width h-height moveto
+ 0 h-height lineto
+ 0 0 lineto
+ h-width 0 lineto
+ h-width .8 mul h-height moveto
+ h-width .8 mul h-height .4 mul lineto
+ stroke
+ h-width h-space add 0 translate 
+} def
+
+/h-resh {
+ newpath
+ 0 0 moveto
+ 0 h-height lineto
+ h-width h-height lineto
+ stroke
+ h-width h-space add 0 translate
+} def
+
+/h-shin {
+ newpath
+ 0 h-height moveto
+ 0 0 lineto
+ h-width 0 lineto
+ h-width .5 mul h-height moveto
+ h-width .5 mul h-height .4 mul lineto 
+ h-width h-height .4 mul lineto 
+ h-width h-height moveto
+ h-width 0 lineto
+ 0 h-height 1.2 mul moveto
+ 0 h-height 1.1 mul lineto 
+ stroke
+ h-width h-space add 0 translate
+} def
+
+/h-sin {
+ newpath
+ 0 h-height moveto
+ 0 0 lineto
+ h-width 0 lineto
+ h-width .5 mul h-height moveto
+ h-width .5 mul h-height .4 mul lineto 
+ h-width h-height .4 mul lineto 
+ h-width h-height moveto
+ h-width 0 lineto
+ h-width h-height 1.2 mul moveto
+ h-width h-height 1.1 mul lineto 
+ stroke
+ h-width h-space add 0 translate
+} def
+
+/h-taw {
+ newpath
+ 0 0 moveto
+ 0 h-height lineto
+ h-width h-height lineto
+ h-width .8 mul h-height moveto
+ h-width .8 mul 0 lineto
+ h-width 0 lineto
+ stroke
+ h-width h-space add 0 translate
+} def
+
+/discordiansociety {
+ 1834 srand
+ /randmax 2 31 exp def
+ 320 {
+  rand randmax div 140 mul 70 sub 
+  rand randmax div 170 mul 85 sub 
+   moveto
+  discordian
+ } repeat
+ (The Discordian Society) /trumptitle exch def
+} def
+
+/discordian { %a random stick figure
+ gsave 
+  currentpoint translate
+  rand randmax div .2 mul .5 add dup scale
+  newpath
+  /da-leftangle rand randmax div 90 mul 135 add def
+  /da-rightangle rand randmax div 90 mul -45 add def
+  da-leftangle cos 5 sqrt mul da-leftangle sin 5 sqrt mul 1 add moveto
+  0 1 lineto
+  da-rightangle cos 5 sqrt mul da-rightangle sin 5 sqrt mul 1 add lineto
+  0 2 moveto
+  0 2.75 .75 -90 270 arc
+  0 -1 lineto
+  /dl-leftangle rand randmax div 50 mul 215 add def
+  /dl-rightangle rand randmax div 50 mul -85 add def
+  dl-leftangle cos 17 sqrt mul dl-leftangle sin 17 sqrt mul 1 sub moveto
+  0 -1 lineto
+  dl-rightangle cos 17 sqrt mul dl-rightangle sin 17 sqrt mul 1 sub lineto
+  stroke
+ grestore  
+} def
+
+/bavarianilluminati { 
+ gsave
+  gsave
+   .9 setgray
+   bavarians
+  grestore
+  gsave
+   newpath
+   0 60 moveto
+   60 -60 lineto
+   -60 -60 lineto
+   closepath
+   clip
+   bavarians
+  grestore
+  gsave
+   .6 setgray
+   newpath
+   0 45 15 2 sqrt mul sub moveto
+   0 45 15 2 sqrt mul -90 -45 arc
+   0 15 15 2 sqrt mul 45 135 arc
+   0 45 15 2 sqrt mul -135 -90 arc
+   0 30 15 2 sqrt mul 15 sub -90 270 arc
+   eoclip 
+   bavarians
+  grestore
+ grestore
+ (The Bavarian Illuminati) /trumptitle exch def
+} def
+
+/bavarians {
+ /bav-dim 70 def
+ /bav-kern 3 def
+ /bav-lead 5 def
+ /bav-alt .25 def
+ -1 bav-lead bav-dim div 1 {
+  /bav-up exch def
+  /bav-alt bav-alt -1 mul def
+  -1 bav-kern bav-dim div 1 {
+   /bav-over exch def
+   bav-over bav-dim mul bav-kern bav-alt mul add bav-up bav-dim mul moveto
+   bavarian
+  } for
+ } for
+} def
+
+/bavarian {
+ gsave 
+  currentpoint translate
+  .5 .5 scale
+  newpath
+  0 0 moveto
+  0 2 moveto
+  0 2.75 .75 -90 270 arc
+  0 -1 lineto
+  -1 -5 moveto
+  0 -1 lineto
+  1 -5 lineto
+  -2 0 moveto
+  0 1 lineto
+  2 0 lineto
+  stroke
+ grestore 
+} def
+
+/greyface { %greyface
+ gsave
+  1 setlinewidth
+  gsave %head and body
+   newpath
+    10 56.25 moveto
+    5 66.25 5 0 180 arc
+    0 56.25 10 90 360 arc
+   fillstroke
+   eyes
+   newpath
+    0 46.25 moveto
+    0 0 lineto
+    0 0 moveto
+    -15 -72.5 lineto
+    0 0 moveto
+    15 -72.5 lineto
+    -20 -5 moveto
+    -17.5 40 lineto
+    17.5 40 lineto
+    20 -5 lineto
+   stroke
+  grestore
+  gsave %shirt
+   newpath
+    -2 45 moveto
+    -2 5 lineto
+    -2 45 lineto
+    20 45 lineto
+    22.5 0 lineto
+    17.5 0 lineto
+    15 35 lineto
+    10 5 lineto
+    -10 5 lineto
+    -15 35 lineto
+    -17.5 0 lineto
+    -22.5 0 lineto
+    -20 45 lineto
+    closepath
+   .6 grayfillstroke
+  grestore
+  gsave %pants
+   newpath
+    0 5 moveto
+    10 5 lineto
+    20 -65 lineto
+    10 -65 lineto
+    0 -15 lineto
+    -10 -65 lineto
+    -20 -65 lineto
+    -10 5 lineto
+    closepath
+   .6 grayfillstroke
+  grestore
+  gsave %tie
+   newpath
+    0 46 moveto
+    3.75 43 lineto
+    2 40 lineto
+    -2 40 lineto
+    2 40 lineto
+    3.75 12.5 lineto
+    0 10 lineto
+    -3.75 12.5 lineto
+    -2 40 lineto
+    -3.75 43 lineto
+    closepath
+   .6 grayfillstroke
+  grestore
+  gsave %collar
+   newpath
+    0 46 moveto
+    7.5 46 lineto
+    7.5 40 lineto
+    0 46 lineto
+    -7.5 46 lineto
+    -7.5 40 lineto
+    0 46 lineto
+   .6 grayfillstroke
+  grestore 
+ grestore
+ (Greyface) /trumptitle exch def
+} def
+
+/eris { %eris
+ gsave
+  0 srand
+  newpath
+   625 { %background
+    0 0 cardwidth 2 sub 2 div cardheight 2 sub 2 div erisepoint erisline
+   } repeat
+   125 { %head
+    0 56.25 7.5 11.25 erisepoint erisline
+   } repeat
+   625 { %torso
+    0 25 15 20 erisepoint erisline
+   } repeat
+   125 { %abdomen
+    0 0 10 10 erisepoint erisline 
+   } repeat
+  stroke
+  gsave
+   -10 0 translate
+   -20 rotate
+   newpath
+    250 { %leg
+     0 -15 5 15 erisepoint erisline
+    } repeat
+   stroke
+   0 -30 translate
+   -20 rotate
+   newpath
+   250 {
+     -2.5 -15 4.5 15 erisepoint erisline
+    } repeat
+    62 { %feet
+     -5 -32.5 7.5 2.5 erisepoint erisline
+    } repeat
+   stroke  
+  grestore
+  gsave
+   10 0 translate
+   0 rotate
+   newpath
+    250 { %leg
+     0 -15 5 15 erisepoint erisline
+    } repeat
+   stroke
+   0 -30 translate
+   -20 rotate
+   newpath
+   250 {
+     2.5 -15 4.5 15 erisepoint erisline
+    } repeat
+    62 { %feet
+     5 -32.5 7.5 2.5 erisepoint erisline
+    } repeat
+   stroke  
+  grestore
+  gsave %arm
+   15 40 translate
+   120 rotate
+   newpath
+    150 {
+     0 -10 4.5 10 erisepoint erisline
+    } repeat  
+   stroke
+   0 -20 translate
+   60 rotate
+   newpath
+    125 {
+     0 -10 3.5 10 erisepoint erisline
+    } repeat  
+    125 {
+     0 -25 5 5 erisepoint erisline
+    } repeat
+   stroke 
+  grestore
+  gsave %arm
+   -15 40 translate
+   -30 rotate
+   newpath
+    150 {
+     0 -10 4.5 10 erisepoint erisline
+    } repeat  
+   stroke
+   0 -20 translate
+   -50 rotate
+   newpath
+    125 {
+     0 -10 3.5 10 erisepoint erisline
+    } repeat  
+    125 {
+     0 -25 5 5 erisepoint erisline
+    } repeat
+   stroke 
+  grestore
+  gsave %hair
+   0 56.25 translate
+   5 {
+    newpath
+     125 {
+      -30 0 30 5 erisepoint erisline
+     } repeat
+    stroke
+    -10 rotate
+    0 2.5 translate
+   } repeat
+  grestore
+ grestore
+ (Eris) /trumptitle exch def
+} def
+
+/erisline { % x y erisline -
+   moveto
+ /tempdeg rand randmax div 360 mul def
+ tempdeg cos tempdeg sin rlineto  
+  
+} def
+
+/erisrpoint { % rectangular space
+ /e-height exch def
+ /e-width exch def
+ /e-y exch def
+ /e-x exch def
+ e-x rand randmax div e-width mul e-width 2 div sub add
+ e-y rand randmax div e-height mul e-height 2 div sub add
+} def
+
+/erisepoint { % elliptical space
+ /e-height exch def
+ /e-width exch def
+ /e-y exch def
+ /e-x exch def
+ /tempdeg rand randmax div 360 mul def
+ /temprad rand randmax div def
+ e-x temprad tempdeg cos mul e-width mul add
+ e-y temprad tempdeg sin mul e-height mul add
+} def
+
+
+/goldenapple {
+ gsave
+ drawapple
+ kallistei
+ grestore
+ (The Golden Apple) /trumptitle exch def
+} def
+
+/drawapple {
+ /applestart 25 def
+ /appletop 20 def
+ /appleheight 25 def
+ /appleangle 15 def
+ /applesin appleangle sin def
+ /applecos appleangle cos def
+ /appletan applesin applecos div def
+ /applesideconst applestart appletop 2 mul applesin mul sub applecos appletop 2 mul mul appletan div sub def 
+ /applebottom
+   appleheight -1 mul applesideconst sub
+   1 applecos add appletan div applesin add div
+ def
+ 2 {
+ -1 1 scale
+  newpath
+  applepath
+  gsave
+  clip
+  0 .05 .5 {
+   /tempgray exch def
+   90 tempgray mul cos 1 scale
+   1 1 tempgray sub 2 div sub setgray
+   newpath
+   applepath
+   fill
+  } for
+  grestore
+  stroke
+ } repeat
+ newpath
+ 0 applestart moveto
+ appletop -1 mul applestart appletop 0 90 arc
+ appletop -.7 mul applestart appletop -.7 mul appletop 90 180 ell
+ stroke
+} def
+
+/applepath {
+  0 applestart moveto
+  appletop applecos mul applestart appletop applesin mul sub appletop 180 appleangle sub appleangle -1 mul arcn
+%  x y lineto % I can't get this to work so I'm letting postscript do it for me.
+  applebottom appleheight -1 mul applebottom appleangle -1 mul -180 arcn
+} def
+
+/kallistei {
+% the text way
+% /kaltext (kallisthi) def
+% /Symbol findfont 10 scalefont setfont
+% kaltext stringwidth pop -2 div -5 moveto
+% kaltext show
+%the line way
+ gsave
+ .7 1 scale
+ newpath
+ /kalspace 2.5 def
+ /kalwidth 10 def
+ /kalheight 10 def
+ /kalnext {
+  kalspace kalwidth add 0 translate
+ } def
+ -3.5 kalwidth mul -4 kalspace mul add kalheight -2 div translate
+ 0 10 moveto %k
+ 0 0 lineto
+ 10 10 moveto
+ 0 0 lineto
+ 5 5 moveto
+ 10 0 lineto
+ kalnext
+ 0 0 moveto %a
+ 5 10 lineto
+ 10 0 lineto
+ 2.5 5 lineto
+ kalnext
+ 0 0 moveto %l
+ 5 10 lineto
+ 10 0 lineto
+ kalnext
+ 0 0 moveto %l
+ 5 10 lineto
+ 10 0 lineto
+ kalnext
+ 0 10 moveto %i
+ 0 0 lineto
+ kalspace 0 translate
+ 10 10 moveto %s
+ 0 10 lineto
+ 5 5 lineto
+ 0 0 lineto
+ 10 0 lineto
+ kalnext
+ 0 10 moveto %t
+ 10 10 lineto
+ 5 10 moveto
+ 5 0 lineto
+ kalnext
+ 0 10 moveto %e
+ 0 0 lineto
+ 0 5 moveto
+ 10 5 lineto
+ 10 10 moveto
+ 10 0 lineto
+ kalnext
+ 0 10 moveto %i
+ 0 0 lineto
+ stroke
+ grestore
+} def
+
+/pentagon {
+ gsave
+ 45 0 moveto
+ 5 {
+ 360 5 div rotate
+ 45 0 lineto
+ } repeat
+ stroke
+ 1 -.1 -1 {
+  /iter exch def
+  1 iter abs sub setgray
+  /size 32.5 12.5 iter mul add def
+  newpath
+  size 0 moveto
+  5 {
+   360 5 div rotate
+   size 0 lineto
+  } repeat 
+  fill
+ } for
+ 20 0 moveto
+ 5 {
+ 360 5 div rotate
+ 20 0 lineto
+ } repeat
+ fillstroke
+ grestore
+ (The Pentagon) /trumptitle exch def
+} def
+
+/sacredchao {
+ gsave
+ newpath
+% 52.5 0 moveto
+% 0 0 52.5 0 360 arc
+ 2 {
+ -52.5 0 moveto
+ 0 0 52.5 180 0 arc
+ 25 0 27.5 0 180 arc
+ -25 0 22.5 0 -180 arcn
+ -27.5 0 20 180 0 arcn
+ -25 0 17.5 0 -180 arcn
+ -27.5 0 15 180 0 arcn
+ -25 0 12.5 0 -180 arcn
+ -27.5 0 10 180 0 arcn
+ 180 rotate
+ } repeat
+ stroke
+ gsave
+ -25 0 translate
+ currentlinewidth 2 mul setlinewidth
+ .4 dup scale
+ drawapple
+ newpath
+ -20 20 moveto
+ -20 -20 lineto
+ 20 20 lineto
+ 0 0 moveto
+ 20 -20 lineto
+ stroke
+ grestore
+ gsave
+ 25 0 translate
+ newpath
+ 16 0 moveto
+ 5 {
+ 360 5 div rotate
+ 16 0 lineto
+ } repeat
+ fill
+ newpath
+ 10 0 moveto
+ 5 {
+ 360 5 div rotate
+ 10 0 lineto
+ } repeat
+ fillstroke
+ grestore 
+ grestore
+ (The Sacred Chao) /trumptitle exch def
+} def
+
+/TextBegin{
+ /t-vpos cardheight 2 div 2 sub def
+ /t-margin cardwidth -2 div 5 add def
+ t-newline 
+} def
+
+/t-newline{
+ /t-vpos t-vpos t-fontsize sub def
+ t-margin t-vpos moveto
+} def
+
+/t-sesquiline{
+ /t-vpos t-vpos t-fontsize 1.5 mul sub def
+ t-margin t-vpos moveto
+} def
+
+/t-setfont{
+ /t-fontsize exch def
+ basefont t-fontsize scalefont setfont
+} def
+
+/t-center {
+ /tempstring exch def
+ tempstring stringwidth pop -2 div t-vpos moveto
+ tempstring show
+ t-newline
+} def
+
+/t-line {
+ show t-newline
+} def
+
+/t-proseline {
+ show t-sesquiline
+} def
+
+/extra1 { %trump interpretations
+ gsave
+  15  t-setfont
+  TextBegin
+  (Trumps) t-center
+  8 t-setfont
+  (Sacred Cow: a sacred cow.) t-line
+  (A Pope: querent, i.e. for whom the) t-line
+   (cards are read,  or anybody really.) t-center
+  (The Initiate: one who seeks knowledge) t-line
+  (The Illuminate: one who dispenses) t-line
+   (knowledge) t-center
+  (The Believer: one who accepts ideas) t-line
+  (The Skeptic: one who rejects ideas) t-line
+  (The Flower: sex, drugs, hedonism) t-line
+  (The Trout: humor and laughter) t-line
+  (Conspiracy: the plot behind all) t-line
+   (coincidence) t-center
+  (Joker: wild card, means whatever) t-line
+  (Net of Synchronicity: the cosmic force) t-line
+   (behind all coincidence) t-center
+  (This Discordian Deck: this deck) t-line
+  (The Big Bang: eristic creation) t-line
+  (The Great Pyramid: aneristic creation) t-line
+  (Radioactivity: aneristic destruction) t-line
+  (The Tower of Babel: eristic destruction) t-line
+  (The Discordian Society: folk of chaos) t-line
+  (The Bavarian Illuminati: folk of order) t-line
+  (Greyface: person of order) t-line
+  (Eris: person of chaos) t-line
+  (The Golden Apple: eristic forces) t-line
+  (The Pentagon: aneristic forces) t-line
+  (The Sacred Chao: balance of hodge) t-line
+   (and podge, the whole shebang) t-center
+ grestore
+} def
+
+/extra2{ %suit and rank interpretations
+ gsave
+  15 t-setfont
+  TextBegin
+  (Suits and Ranks) t-center
+  8 t-setfont
+  (Sweets) t-center
+  sweet (Taste, Water, Pleasure) t-center  
+  (Booms) t-center
+  boom (Hearing, Air, Action ) t-center
+  (Pungents) t-center
+  pungent (Smell, Aether, Intensity) t-center  
+  (Prickles) t-center
+  prickle (Touch, Earth, Continuance) t-center  
+  (Oranges) t-center
+  orange (Sight, Fire, Bizarreness) t-center
+  (Z: A lack of the given quality) t-line  
+  (1: Enough of the given quality) t-line  
+  (2: Balance of the given quality) t-line  
+  (3: Imbalance of the given quality) t-line  
+  (4: Excess of the given quality) t-line  
+  (O: A Moment of the given quality) t-line  
+  (D: Day of Week, phase of undertaking) t-line  
+  (S: Season of Year, type of illusion) t-line  
+  (C: One unchanged in suit's midst) t-line  
+  (A: Apostle of Eris, person of suit) t-line
+  (Named Cards) t-center 
+  (D: Sweetmorn, Boomtime, Pungenday,) t-line
+   (     Prickle-Prickle, Setting Orange) t-line  
+  (S: Chaos, Discord, Confusion,) t-line
+   (     Bureaucracy, The Aftermath) t-line  
+  (A: Hung Mung, Dr. Van Van Mojo,) t-line
+   (     Saint Gulik, Zarathud,) t-line
+   (     Malaclypse the Elder) t-line 
+ grestore
+} def
+
+/extra3 { %credits
+ gsave
+  15 t-setfont
+  TextBegin
+  (Credits) t-center
+  8 t-setfont
+  (  The Ancient Discordian Deck was) t-proseline
+  (originally discovered by Max Flax) t-proseline
+  (Beeblewax and (boing!) Cnoocy ) t-proseline
+  (Mosque O'Witz in YOLD 3160.  This) t-proseline
+  (version follows the original in structure) t-proseline 
+  (but uses completely new images.  The ) t-proseline
+  (entire deck is ) show e3-k (, feel free to reprint or) t-proseline
+  (embellish to your heart's content. Most) t-proseline
+  (of the code in this version is by (boing!)) t-proseline
+  (Cnoocy Mosque O'Witz.   ) show e3-beast (, Max) t-proseline
+  (Flax Beeblewax, and Pope Dubious)  t-proseline
+  (Provenance XI all provided invaluable ) t-proseline
+  (assistance in the creation of this version.) t-proseline
+  (  If you have comments or questions, ) t-proseline
+  (send mail to (b!)CMO'W at ) t-proseline
+  (marc@suberic.net.  Hail Eris!) t-proseline
+  t-sesquiline
+  t-newline
+  gsave
+   20 -100 translate
+   1.25 setlinewidth
+   .7 setgray
+   newpath
+    0 0 5 30 330 arc
+    5 -5 lineto
+    7.5 -2.5 2.5 180 0 arcn
+    12.5 -2.5 2.5 180 360 arc
+    17.5 -2.5 2.5 90 450 arc
+    25 -2.5 2.5 90 450 arc
+    32.5 -2.5 2.5 90 30 arcn
+    32.5 -2.5 2.5 30 330 arc
+    37.5 0 lineto
+    40 -2.5 2.5 180 360 arc
+    42.5 0 lineto
+    40 -15 2.5 360 150 arcn
+    40 10 add 2.5 3 sqrt mul sub -15 10 3 sqrt mul add 2.5 add lineto  
+   30 rotate
+   1 .25 scale
+   stroke
+  grestore 
+  (Sweetmorn, Confusion 35, YOLD 3168) t-center
+ grestore 
+} def
+
+/e3-k {
+ currentpoint
+ /y exch def
+ /x exch def
+ /o-linewidth currentlinewidth def
+ .25 setlinewidth
+ newpath
+  x 6 add y 3 add moveto
+  x 3 add y 3 add 3 0 360 arc
+  x 3 add y 6 add moveto
+  x 2 add y 6 add 1 0 90 arc
+  x 1.5 add y 4.5 add moveto
+  x 1.5 add y 1.5 add lineto
+  x 4.5 add y 4.5 add lineto
+  x 3 add y 3 add lineto
+  x 4.5 add y 1.5 add lineto  
+ stroke
+ x 6 add y moveto
+ o-linewidth setlinewidth
+} def
+
+/e3-beast{ %the human named Lumpy-Beast
+ currentpoint
+ /y exch def
+ /x exch def
+ /o-linewidth currentlinewidth def
+ .25 setlinewidth
+ newpath
+  %Beast-N-Quality-0
+  x 3.5 add y 4.75 add moveto
+  x 2.5 add y 4.75 add .75 0 90 arc
+  x 4.25 add y 3.5 add moveto
+  x 3.5 add y 3.5 add .75 0 360 arc
+  x 2.5 add y 3.25 add moveto
+  x 2.5 add y 2.5 add .75 90 270 arc
+  x 4.5 add y 1.75 add moveto
+  x 4.5 add y 2.5 add .75 -90 90 arc
+
+  x 1 add y 1.5 add moveto
+  x .5 add y 1.5 add .5 0 180 arc
+  x 1 add y 1.5 add 1 1.5 180 270 ell
+
+  x 3.5 add y 6.5 add moveto
+  x 4 add y 6.5 add .5 180 360 arc
+  x 5 add y 6.5 add .5 180 0 arcn
+
+  x 7 add y 0.5 add moveto
+  x 6.5 add y 0.5 add .5 0 360 arc
+
+  /x x 9 add def
+  %Human-R-Agent-1
+  x 4.25 add y 4.75 add moveto
+  x 3.5 add y 4.75 add .75 0 360 arc
+  x 1 add y 3.25 add moveto
+  x 6 add y 3.25 add lineto
+  x 2.5 add y 2.75 add moveto
+  x 2.5 add y 1 add lineto
+  x 4.5 add y 2.75 add moveto
+  x 4.5 add y 1 add lineto
+
+  x 0 add y 0 add moveto
+  x 0.5 add y 0.5 add 0.5 180 0 arcn
+  x 1 add y 0 add lineto
+
+  x 1.5 add y 7 add moveto
+  x 1.5 add y 6.5 add 0.5 90 270 arc
+  x 6 add y 6 add lineto
+
+  x 6 add y 1 add moveto
+  x 6 add y 0 add lineto
+  x 7 add y 0 add lineto  
+    
+ stroke
+ o-linewidth setlinewidth
+ x 7 add y moveto
+} def
+
+/trumpfuncs [{} %0
+ {sacredcow} {pope} {initiate} {illuminate} {believer} %1-5
+ {skeptic} {flower} {trout} {conspiracy} {joker} %6-10
+ {synchronicity} {discordiandeck} {bigbang} {greatpyramid} {radioactivity} %11-15
+ {towerofbabel} {discordiansociety} {bavarianilluminati} {greyface} {eris} %16-20
+ {goldenapple} {pentagon} {sacredchao}         %20-23
+          {extra1} {extra2} %extra 1-2
+ {extra3} {} {} {} {} %extra 3-7
+] def
+
+/trumphead {
+ trumpnum 23 le {
+ gsave
+ 0 cardheight moveto
+ .125 inch -.125 inch rmoveto
+ 15 0 rmoveto
+ gsave
+  currentpoint translate
+  2 2 scale
+  trumpnum mayan
+ grestore
+ 
+ cardwidth cardheight moveto
+ -.125 inch -.125 inch rmoveto
+ -15 0 rmoveto
+ gsave
+  currentpoint translate
+  2 2 scale
+  trumpnum mayan
+ grestore
+
+ cardwidth 2 div cardheight moveto
+ 0 -.125 inch rmoveto
+ /numstring trumpnum 10 (   ) cvrs def
+ basefont 15 scalefont setfont
+ numstring stringwidth pop -2 div -10 rmoveto
+ numstring show 
+ 
+ grestore
+ } if
+} def
+
+/trumpfoot {
+ /footstring exch def
+ /fontsize 15 def
+ {
+ basefont fontsize scalefont setfont
+ footstring stringwidth pop cardwidth .25 inch sub lt {exit} if
+ /fontsize fontsize 1 sub def
+ } loop
+ cardwidth 2 div .125 inch moveto
+ footstring stringwidth pop -2 div 0 rmoveto
+ footstring show
+} def
+
+/trumps {
+ gsave
+  0 1 9{
+   /cardnum exch def
+   cardnum cardstart
+   /trumpnum trumppage 10 mul cardnum 1 add add def
+   trumphead
+   gsave
+    cardwidth 2 div cardheight 2 div translate
+    trumpfuncs trumpnum get exec
+   grestore
+   trumptitle trumpfoot
+   /trumptitle () def
+   cardend
+  } for
+ grestore 
+} def
+
+/mayan {
+ gsave
+ 1 setlinewidth
+ currentpoint translate
+ /num exch def
+ num 20 lt { %just hit the digit if < 20
+  num mayandigit
+ } {
+  /order num log 20 log div floor def
+  order -1 0 {
+   /tempord exch def
+   /placevalue 20 tempord exp cvi def
+   num placevalue idiv 20 mod
+   mayandigit
+  } for
+ } ifelse
+ grestore
+} def
+
+/mayandigit {
+ /digit exch def
+ digit 0 eq {
+  mayanzero
+ } if  
+ [{} {mayanone} {mayantwo} {mayanthree} {mayanfour}]
+  digit 5 mod get exec
+ digit 5 idiv {mayanline} repeat
+ 0 -1 translate
+} def
+
+/mayanzero{
+  0 0 moveto
+  gsave
+  .5 setlinewidth
+  newpath
+  0 -5 5 90 135 arc 
+  0 5 2 sqrt mul 5 sub 5 225 315 arc 
+  0 -5 5 45 90 arc 
+  -4 2 sqrt div 6 2 sqrt div 5 sub moveto
+  0 5 2 sqrt mul 5 sub 4 225 315 arc 
+  0 0 moveto
+  -1 5 2 sqrt mul 5 sub 15 sqrt sub lineto
+  1 6 sqrt 3 sub moveto
+  0 5 2 sqrt mul 9 sub lineto
+  stroke
+  grestore
+
+  0 5 2 sqrt mul 12 sub translate
+
+} def
+
+/mayanone{
+ 0 0 mayandot
+ 0 -2.5 translate
+} def
+
+/mayantwo{
+ -2.5 0 mayandot
+ 2.5 0 mayandot
+ 0 -2.5 translate
+} def
+
+/mayanthree{
+ -5 0 mayandot
+ 0 0 mayandot
+ 5 0 mayandot
+ 0 -2.5 translate
+} def
+
+/mayanfour{
+ -4.5 0 mayandot
+ -1.5 0 mayandot
+ 1.5 0 mayandot
+ 4.5 0 mayandot
+ 0 -2.5 translate
+} def
+ 
+/mayandot{
+ /y exch def
+ /x exch def
+ x currentlinewidth 2 div add y moveto
+ x y currentlinewidth 2 div 0 360 arc
+ stroke
+} def
+
+/mayanline{
+ newpath
+ -7.5 0 moveto
+ 7.5 0 lineto
+ stroke
+ 0 -2 translate
+} def
+
+%end trumps
+
+%deck constants
+/basefont (AvantGarde-Book) findfont def
+
+/backpattern{
+ gsave
+  2.25 dup scale
+  gsave
+   144 rotate
+   0 20 translate
+   -7.5 -7.5 moveto
+   sweet
+  grestore
+  gsave
+   72 rotate
+   0 20 translate
+   -7.5 -7.5 moveto
+   boom
+  grestore
+  gsave
+   0 20 translate
+   -7.5 -7.5 moveto
+   pungent
+  grestore
+  gsave
+   -72 rotate
+   0 20 translate
+   -7.5 -7.5 moveto
+   prickle
+  grestore
+  gsave
+   -144 rotate
+   0 20 translate
+   -7.5 -7.5 moveto
+   orange
+  grestore
+ grestore
+} def
+
+/backmask{ %wholepage
+ gsave
+  .75 setgray
+  gsave
+   newpath
+    0 5 8.5 inch {
+     pop
+     hbackline
+     0 5 translate
+    } for
+   stroke
+  grestore
+ grestore
+} def
+
+/hbackline{
+ 0 0 moveto
+ 0 5 11 inch {
+  pop
+  0 5 rlineto
+  5 -5 rlineto
+  -5 0 rlineto
+  5 5 rlineto
+  0 -5 rlineto
+ } for
+} def
+
+/backmask_old { %for calling immediately before backpattern
+ gsave
+  .75 setgray
+  gsave
+   0 cardheight -2 div translate
+   newpath
+    0 2.5 cardheight 2 div {
+     /y exch def
+     cardwidth -2 div y moveto
+     cardwidth -4 div y 2 mul cardwidth 4 div y -90 0 ell
+     cardwidth 4 div y 2 mul cardwidth 4 div y -180 -90 ell
+     cardwidth 2 div y lineto
+    } for 
+   stroke
+  grestore
+  gsave
+   0 cardheight 2 div translate
+   newpath
+    0 -2.5 cardheight -2 div {
+     /y exch def
+     cardwidth -2 div y moveto
+     cardwidth -4 div y 2 mul cardwidth 4 div y -1 mul 90 0 elln
+     cardwidth 4 div y 2 mul cardwidth 4 div y -1 mul 180 90 elln
+     cardwidth 2 div y lineto
+    } for 
+   stroke
+  grestore
+  gsave
+   cardwidth -2 div 0 translate
+   newpath
+    0 2.5 cardwidth 2 div {
+     /x exch def
+     x cardheight -2 div moveto
+     x 2 mul cardheight -4 div x cardheight 4 div 180 90 elln
+     x 2 mul cardheight 4 div x cardheight 4 div 270 180 elln
+     x cardheight 2 div lineto
+    } for 
+   stroke
+  grestore
+  gsave
+   cardwidth 2 div 0 translate
+   newpath
+    0 -2.5 cardwidth -2 div {
+     /x exch def
+     x cardheight -2 div moveto
+     x 2 mul cardheight -4 div x -1 mul cardheight 4 div 0 90 ell
+     x 2 mul cardheight 4 div x -1 mul cardheight 4 div 270 0 ell
+     x cardheight 2 div lineto
+    } for 
+   stroke
+  grestore
+ grestore
+} def
+
+/drawtrumppage {
+ /trumppage exch def
+ pageBegin
+ cardborders
+ gsave
+  .03125 inch 8.225 inch moveto 7.5 15 rmoveto
+   trumppage mayan
+ trumps
+ grestore
+ showpage
+} def
+
+/drawsuitpage {
+ /suitnum exch def 
+ pageBegin
+ setsuit
+ cardborders
+ gsave
+  .03125 inch 8.225 inch moveto suit
+  cards
+ grestore
+ showpage 
+} def
+
+/drawbackpage {
+ gsave
+  8.5 inch 0 translate
+  -1 1 scale
+  pageBegin
+  backmask
+  0 1 9 {
+  gsave
+   cardstart
+   newpath
+    0 0 moveto
+    cardwidth 0 rlineto
+    0 cardheight rlineto
+    cardwidth -1 mul 0 rlineto
+   clip
+   cardwidth 2 div cardheight 2 div translate
+   -1 1  scale
+   backpattern 
+  grestore
+  } for
+ grestore
+ showpage 
+} def
+
+
+%%EndProlog
+
+%%Page: trumps-0 1
+0 drawtrumppage
+
+%%Page: trumps-1 2
+1 drawtrumppage 
+
+%%Page: trumps-2 3
+2 drawtrumppage
+
+
+%%Page: sweets 4
+0 drawsuitpage
+
+%%Page: booms 5
+1 drawsuitpage
+
+%%Page: pungents 6
+2 drawsuitpage
+
+%%Page: prickles 7
+3 drawsuitpage
+
+%%Page: oranges 8
+4 drawsuitpage
+
+%%Page: backs 9
+drawbackpage
+
+%%Trailer
+%%Pages: 8
+%%EOF 
