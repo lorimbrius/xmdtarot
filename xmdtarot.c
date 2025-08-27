@@ -19,7 +19,7 @@
 #elif DECKV == 2
 #   include "deck_v2.h"
 #else /* DECKV != 1 && DECKV != 2 */
-#   error "No valid deck selected, please define DECKV as deck_v1 or deck"
+#   error "No valid deck selected, please define DECKV as 1 or 2"
 #endif /* DECKV */
 
 Widget toplevel, drawing_area;
