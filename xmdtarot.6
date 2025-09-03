@@ -1,29 +1,32 @@
-.Dd August 8, 2025
-.Dt DTAROT 6
+.Dd September 3, 2025
+.Dt XMDTAROT 6
 .Os
 .Sh NAME
-.Nm dtarot
-.Nd "Discordian Tarot program"
+.Nm xmdtarot
+.Nd "X11/Motif Discordian Tarot program"
 .Sh SYNOPSIS
 .Nm
-.Op Fl m
 .Sh DESCRIPTION
 The
 .Nm
-utility prints your (or someone else's) super-helpful Discordian Tarot reading.
+utility draws your (or someone else's) super-helpful Discordian Tarot reading.
 .Pp
-Adding the -m argument also provides putative meanings for the cards, for \
-those unfamiliar with this deck.
-Of course, you're free to add whatever meaning you'd like; all things are \
-true|false|meaningless anyway.
+The spread is drawn as a pentagon with the positions of True on top, Seek next,\
+then False, then Avoid, and, finally, Meaningless. See if you can spot the \
+pattern!
 .Pp
-These options are available:
+.Sh KEYS
 .Bl -tag -width Ds
-.It Fl m
-Provides putative meanings for the cards drawn.
+.It Ao Ctrl Ac + Aq M
+Show putative card meanings below cards. Of course, you're free to add whatever meaning you'd like; all things are true|false|meaningless anyway.
+.It Ao Ctrl Ac + Aq N
+Draw a new spread (each second seeds the RNG so doing it too often leads to it not actually drawing a new spread)
+.It Ao Ctrl Ac + Aq Q
+Quit the program
 .El
 .Sh SEE ALSO
 .Xr ddate 1
+.Xr dtarot 6
 .Sh DISTRIBUTION POLICY
 Public domain.
 All rites reversed.
@@ -34,8 +37,5 @@ All rites reversed.
 .An (boing!) Cnoocy Mosque O'Witz Aq Mt marc@suberic.net
 .Sh AVAILABILITY
 The
-.Nm
-command is available in PyPi at
-.Lk https://pypi.org/project/dtarot/
 Source code is available at
-.Lk https://github.com/lorimbrius/dtarot
+.Lk https://github.com/lorimbrius/xmdtarot
