@@ -329,11 +329,12 @@ About()
                               "under Creative Commons 0 license\n"
                               "NO rights reserved, but ALL rites reversed.\n"
                               "\n";
+    const int ABOUT_TEXT_LEN = 159;
 
     XmString about_string, label_string, ok_string;
     Widget   about_dialog, about_label;
     Arg      args[X11_ARGS_MAX];
-    int      n, about_text_len, deck_about_text_len;
+    int      n;
     char     *about_text_buffer;
 
     n            = 0;
@@ -342,12 +343,10 @@ About()
     XtSetArg(args[n], XmNtitle, about_string);                             n++;
     XtSetArg(args[n], XmNdialogStyle, XmDIALOG_PRIMARY_APPLICATION_MODAL); n++;
 
-    about_text_len      = strlen(ABOUT_TEXT);
-    deck_about_text_len = strlen(DECK_ABOUT_STRING);
-    about_text_buffer   = calloc(about_text_len + deck_about_text_len + 1, sizeof(char));
+    about_text_buffer = (char *) calloc(ABOUT_TEXT_LEN + DECK_ABOUT_TEXT_LEN + 1, sizeof(char));
 
-    strncpy(about_text_buffer, ABOUT_TEXT, about_text_len);
-    strncat(about_text_buffer, DECK_ABOUT_STRING, deck_about_text_len);
+    strncpy(about_text_buffer, ABOUT_TEXT, ABOUT_TEXT_LEN);
+    strncat(about_text_buffer, DECK_ABOUT_STRING, DECK_ABOUT_TEXT_LEN);
 
     about_dialog = XmCreateFormDialog(toplevel, "about_dialog", args, n);
     label_string = XmStringCreateLocalized(about_text_buffer);
