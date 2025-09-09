@@ -251,6 +251,7 @@ const struct Card DECK[] = {
 
 const char DECK_ABOUT_STRING[] = "Deck and art Kopyleft (K) 2011 Max Flax Beeblewax\n"
                                  "and (Boing!) Cnoocy Mosque O'Witz (marc@suberic.net)";
+const int  DECK_ABOUT_TEXT_LEN = 103;
 
 #endif /* !_DECK_V2_H */
 EOF
